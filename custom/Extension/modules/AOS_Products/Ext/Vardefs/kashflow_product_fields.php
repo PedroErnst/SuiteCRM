@@ -63,3 +63,12 @@ $dictionary['AOS_Products']['fields']['autofill'] = array(
     'reportable' => false,
     'source' => 'db',
 );
+
+$dictionary['AOS_Products']['fields']['from_kashflow'] = array(
+    'name' => 'from_kashflow',
+    'vname' => 'LBL_FROM_KASHFLOW',
+    'type' => 'bool',
+    'default' => false,
+    'reportable' => false,
+    'source' => 'non-db',
+);

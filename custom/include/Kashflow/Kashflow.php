@@ -45,6 +45,35 @@ class Kashflow
         $this->m_client = new SoapClient("https://securedwebapp.com/api/service.asmx?WSDL");
     }
 
+
+    /**
+     * @param $fn
+     * @param null $extra
+     *
+     * @return mixed
+     */
+    private function makeRequest($fn, $extra = NULL)
+    {
+        $parameters['UserName'] = $this->m_username;
+        $parameters['Password'] = $this->m_password;
+        if($extra != NULL)
+            $parameters = array_merge($parameters,$extra);
+        return self::handleResponse($this->m_client->$fn($parameters));
+    }
+
+    /**
+     * @param $response
+     *
+     * @return mixed
+     * @throws Exception
+     */
+    private static function handleResponse($response)
+    {
+        if("NO" == $response->Status)
+            throw(new Exception($response->StatusDetail));
+        return $response;
+    }
+
     /**
      * @return mixed
      */
@@ -142,27 +171,15 @@ class Kashflow
     /**
      * @return mixed
      */
-    public function getSubProducts()
+    public function getSubProducts($code)
     {
-        $test = 1;
+        $test = 0;
         $parameters = "";
+        $parameters['NominalID'] = $code;
         if($test != 0) {
             $parameters['NominalID'] = 22784360;
         }
         return $this->makeRequest("GetSubProducts", $parameters);
-    }
-
-    /**
-     * @param $response
-     *
-     * @return mixed
-     * @throws Exception
-     */
-    private static function handleResponse($response)
-    {
-        if("NO" == $response->Status)
-            throw(new Exception($response->StatusDetail));
-        return $response;
     }
 
     /**
@@ -177,20 +194,5 @@ class Kashflow
      */
     public function getNominalCodes() {
         return $this->makeRequest('GetNominalCodes');
-    }
-
-    /**
-     * @param $fn
-     * @param null $extra
-     *
-     * @return mixed
-     */
-    private function makeRequest($fn, $extra = NULL)
-    {
-        $parameters['UserName'] = $this->m_username;
-        $parameters['Password'] = $this->m_password;
-        if($extra != NULL)
-            $parameters = array_merge($parameters,$extra);
-        return self::handleResponse($this->m_client->$fn($parameters));
     }
 }

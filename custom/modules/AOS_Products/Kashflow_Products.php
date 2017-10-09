@@ -10,30 +10,28 @@ class Kashflow_Products {
     function addOrUpdateSubProduct($bean, $event, $arguments)
     {
         global $sugar_config;
-        if ($sugar_config['kashflow_api']['send_products'] == 1 &&
+        if ($sugar_config['kashflow_api']['send_products'] == 1 && $bean->from_kashflow == false &&
             (($sugar_config['kashflow_api']['send_products_option'] == 'modified' && $bean->date_entered != $bean->date_modified) ||
              ($sugar_config['kashflow_api']['send_products_option'] == 'new' && $bean->date_entered == $bean->date_modified) ||
               $sugar_config['kashflow_api']['send_products_option'] == 'all')) {
             $kashflow = new Kashflow();
-            !empty($bean->kashflow_id) ? $kid = $bean->kashflow_id : $kid = 0;
             $parameters['sp'] = array
             (
-                "id"            => $kid,
+                "id"            => !empty($bean->kashflow_id) ? $bean->kashflow_id : 0,
                 "ParentID"      => $bean->nominal_code,
                 "Name"          => $bean->name,
                 "Code"          => $bean->part_number,
                 "Description"   => $bean->description,
                 "Price"         => $bean->price,
-                "VatRate"       => $bean->vat_rate,
-                "WholesalePrice"=> $bean->cost,
-                "Managed"       => $bean->managed,
-                "QtyInStock"    => $bean->qty_in_stock,
-                "StockWarnQty"  => $bean->stock_warn_qty,
-                "AutoFill"      => $bean->autofill
+                "VatRate"       => !empty($bean->vat_rate) ? $bean->vat_rate : "0.0000",
+                "WholesalePrice"=> !empty($bean->cost) ? $bean->cost : "0.0000",
+                "Managed"       => !empty($bean->managed) ? $bean->managed : 0,
+                "QtyInStock"    => !empty($bean->qty_in_stock) ? $bean->qty_in_stock : 0,
+                "StockWarnQty"  => !empty($bean->stock_warn_qty) ? $bean->stock_warn_qty : 0,
+                "AutoFill"      => $bean->autofill == true ? 1 : 0
             );
             $response = $kashflow->addOrUpdateSubProduct($parameters);
             if(!empty($response->AddOrUpdateSubProductResult)) $bean->kashflow_id = $response->AddOrUpdateSubProductResult;
-
         }
     }
 }

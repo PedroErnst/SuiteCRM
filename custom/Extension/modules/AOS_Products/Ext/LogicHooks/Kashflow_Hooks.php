@@ -28,4 +28,4 @@ if (!isset($hook_array) || !is_array($hook_array)) {
 if (!isset($hook_array['before_save']) || !is_array($hook_array['before_save'])) {
     $hook_array['before_save'] = array();
 }
-$hook_array['before_save'][] = Array(99, 'Add or Update Sub Products', 'custom/modules/AOS_Products/Kashflow_Products.php','Kashflow_Products', 'addOrUpdateSubProduct');
+$hook_array['before_save'][] = Array(19, 'Add or Update Sub Products', 'custom/modules/AOS_Products/Kashflow_Products.php','Kashflow_Products', 'addOrUpdateSubProduct');
