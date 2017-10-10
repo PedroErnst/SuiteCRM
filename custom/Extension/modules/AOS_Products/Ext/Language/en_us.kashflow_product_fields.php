@@ -7,3 +7,4 @@ $mod_strings['LBL_MANAGED'] = 'Managed';
 $mod_strings['LBL_QTY_IN_STOCK'] = 'QtyInStock';
 $mod_strings['LBL_STOCK_WARN_QTY'] = 'StockWarnQty';
 $mod_strings['LBL_AUTOFILL'] = 'Autofill';
+$mod_strings['LBL_FAILED_TO_SEND'] = 'Failed to send product details to Kashflow. Please check Kashflow details in admin panel.';

@@ -32,6 +32,7 @@ class Kashflow_Products {
             );
             $response = $kashflow->addOrUpdateSubProduct($parameters);
             if(!empty($response->AddOrUpdateSubProductResult)) $bean->kashflow_id = $response->AddOrUpdateSubProductResult;
+            if($response->Status == "NO") SugarApplication::appendErrorMessage('LBL_FAILED_TO_SEND');
         }
     }
 }

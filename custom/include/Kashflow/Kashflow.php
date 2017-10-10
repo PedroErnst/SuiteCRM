@@ -45,7 +45,6 @@ class Kashflow
         $this->m_client = new SoapClient("https://securedwebapp.com/api/service.asmx?WSDL");
     }
 
-
     /**
      * @param $fn
      * @param null $extra
@@ -69,7 +68,7 @@ class Kashflow
      */
     private static function handleResponse($response)
     {
-        if("NO" == $response->Status)
+        if($response->Status == "NO")
             throw(new Exception($response->StatusDetail));
         return $response;
     }
@@ -77,7 +76,7 @@ class Kashflow
     /**
      * @return mixed
      */
-    public function insertInvoice()
+    public function insertInvoice($parameters)
     {
         $test = 0;
         $parameters = "";
@@ -120,12 +119,10 @@ class Kashflow
         return $this->makeRequest("InsertInvoice", $parameters);
     }
 
-    /**
-     * @return mixed
-     */
-    public function getInvoicesByDateRange()
+    public function insertInvoiceLine($parameters)
     {
-        return $this->makeRequest("GetInvoicesByDateRange");
+
+        return $this->makeRequest("InsertInvoiceLine", $parameters);
     }
 
     /**
@@ -139,6 +136,19 @@ class Kashflow
             $parameters['InvoiceNumber'] = 1;
         }
         return $this->makeRequest("GetInvoice", $parameters);
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getInvoicesByDateRange()
+    {
+        return $this->makeRequest("GetInvoicesByDateRange");
+    }
+
+    public function getCustomers()
+    {
+        return $this->makeRequest("GetCustomers");
     }
 
     /**
@@ -186,7 +196,7 @@ class Kashflow
      * @return string
      */
     public function checkLoginDetails() {
-        return $this->makeRequest('GetAccountOverview');
+        return $this->makeRequest('GetCustomers');
     }
 
     /**
