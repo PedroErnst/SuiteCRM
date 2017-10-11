@@ -1,5 +1,6 @@
 <?php
 require_once 'custom/include/Kashflow/Kashflow.php';
+require_once 'modules/Contacts/Contact.php';
 class Kashflow_Customer_Hooks {
 
     /**
@@ -17,44 +18,55 @@ class Kashflow_Customer_Hooks {
 
             $kashflow = new Kashflow();
 
-            if(!empty($bean->kashflow_id) && !empty($bean->kashflow_code)) {
+            if($bean->module_dir == "Accounts"){
 
-                $customerCode['CustomerCode'] = $bean->kashflow_code;
-                $customer = $kashflow->getCustomer($customerCode);
-                $parameters['custr'] = $customer->GetCustomerResult;
+                if($bean->load_relationship('contacts')) {
+                    $contactBean = $bean->get_linked_beans('contacts','Contact');
+                    $this->sendCustomerDetails($bean, $contactBean[0], $kashflow);
+                }
+            } elseif($bean->module_dir == "Contacts" && !empty($bean->account_id)) {
+
+                $accountBean = BeanFactory::getBean("Accounts", $bean->account_id);
+                $this->sendCustomerDetails($accountBean, $bean, $kashflow);
             }
+        }
+    }
 
-            $bean->load_relationship('contacts');
-            $contactBean = BeanFactory::getBean('Contacts', $bean->contacts->get());
+    function sendCustomerDetails($account, $contact, $kashflow) {
 
-            $parameters['custr']->CustomerID = !empty($bean->kashflow_id) ? $bean->kashflow_id : 0;
-            $parameters['custr']->Code = $bean->kashflow_code;
-            $parameters['custr']->Name = $bean->name;
-            $parameters['custr']->ContactTitle = !empty($contactBean->salutation) ? $contactBean->salutation : "";
-            $parameters['custr']->ContactFirstName = !empty($contactBean->first_name) ? $contactBean->first_name : "";
-            $parameters['custr']->ContactLastName = !empty($contactBean->last_name) ? $contactBean->last_name : "";
-            $parameters['custr']->Telephone = !empty($bean->phone_office) ? $bean->phone_office : "";
-            $parameters['custr']->Mobile = !empty($contactBean->mobile_phone) ? $contactBean->mobile_phone : "";
-            $parameters['custr']->Fax = !empty($bean->fax) ? $bean->fax : "";
-            $parameters['custr']->Email = $bean->email;
-            $parameters['custr']->Address1 = $bean->billing_address_street;
-            $parameters['custr']->Address2 = $bean->billing_address_city;
-            $parameters['custr']->Address3 = $bean->billing_address_state;
-            $parameters['custr']->Address4 = $bean->billing_address_country;
-            $parameters['custr']->Postcode = !empty($bean->billing_address_postcode) ? $bean->billing_address_postcode : "";
-            $parameters['custr']->Website = $bean->website;
-            $parameters['custr']->Updated = date('Y-m-d', $bean->date_modified)."T00:00:00";
+        if(!empty($account->kashflow_id) && !empty($account->kashflow_code)) {
+            $customerCode['CustomerCode'] = $account->kashflow_code;
+            $customer = $kashflow->getCustomer($customerCode);
+            $parameters['custr'] = $customer->GetCustomerResult;
+        }
 
-            if(empty($bean->kashflow_id)) {
-                $parameters['custr']['Created'] = date('Y-m-d', $bean->date_created)."T00:00:00";
-                $parameters = $this->addDefaultEntries($parameters);
-                $response = $kashflow->insertCustomer($parameters);
-                if(!empty($response->InsertCustomerResult)) $bean->kashflow_id = $response->InsertCustomerResult;
-                if($response->Status == "NO") SugarApplication::appendErrorMessage('LBL_FAILED_TO_SEND');
-            } else {
-                $response = $kashflow->updateCustomer($parameters);
-                if($response->Status == "NO") SugarApplication::appendErrorMessage('LBL_FAILED_TO_SEND');
-            }
+        $parameters['custr']->CustomerID = !empty($account->kashflow_id) ? $account->kashflow_id : 0;
+        $parameters['custr']->Code = $account->kashflow_code;
+        $parameters['custr']->Name = $account->name;
+        $parameters['custr']->ContactTitle = !empty($contact->salutation) ? $contact->salutation : "";
+        $parameters['custr']->ContactFirstName = !empty($contact->first_name) ? $contact->first_name : "";
+        $parameters['custr']->ContactLastName = !empty($contact->last_name) ? $contact->last_name : "";
+        $parameters['custr']->Telephone = !empty($account->phone_office) ? $account->phone_office : "";
+        $parameters['custr']->Mobile = !empty($contact->mobile_phone) ? $contact->mobile_phone : "";
+        $parameters['custr']->Fax = !empty($account->fax) ? $account->fax : "";
+        $parameters['custr']->Email = $account->email;
+        $parameters['custr']->Address1 = $account->billing_address_street;
+        $parameters['custr']->Address2 = $account->billing_address_city;
+        $parameters['custr']->Address3 = $account->billing_address_state;
+        $parameters['custr']->Address4 = $account->billing_address_country;
+        $parameters['custr']->Postcode = !empty($account->billing_address_postcode) ? $account->billing_address_postcode : "";
+        $parameters['custr']->Website = $account->website;
+        $parameters['custr']->Updated = date('Y-m-d')."T00:00:00";
+
+        if(empty($account->kashflow_id)) {
+            $parameters['custr']['Created'] = date('Y-m-d', $account->date_created)."T00:00:00";
+            $parameters = $this->addDefaultEntries($parameters);
+            $response = $kashflow->insertCustomer($parameters);
+            if(!empty($response->InsertCustomerResult)) $account->kashflow_id = $response->InsertCustomerResult;
+            if($response->Status == "NO") SugarApplication::appendErrorMessage('LBL_FAILED_TO_SEND');
+        } else {
+            $response = $kashflow->updateCustomer($parameters);
+            if($response->Status == "NO") SugarApplication::appendErrorMessage('LBL_FAILED_TO_SEND');
         }
     }
 
