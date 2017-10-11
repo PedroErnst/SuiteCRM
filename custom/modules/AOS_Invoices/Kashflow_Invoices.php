@@ -34,7 +34,6 @@ class Kashflow_Invoices {
             $parameters['Inv'] = array
             (
                 "InvoiceDBID"   => 91828459,
-                "InvoiceNumber" => 3,
                 "InvoiceDate"   => "2017-09-20T00:00:00",
                 "DueDate"       => "2017-09-30T00:00:00",
                 "CustomerID"    => 72177290,

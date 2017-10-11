@@ -79,7 +79,6 @@ class Kashflow
     public function insertInvoice($parameters)
     {
         $test = 0;
-        $parameters = "";
         if($test != 0) {
             $line = array
             (
@@ -146,9 +145,24 @@ class Kashflow
         return $this->makeRequest("GetInvoicesByDateRange");
     }
 
+    public function getCustomer($parameters)
+    {
+        return $this->makeRequest("GetCustomer", $parameters);
+    }
+
     public function getCustomers()
     {
         return $this->makeRequest("GetCustomers");
+    }
+
+    public function insertCustomer($parameters)
+    {
+        return $this->makeRequest("InsertCustomer", $parameters);
+    }
+
+    public function updateCustomer($parameters)
+    {
+        return $this->makeRequest("UpdateCustomer", $parameters);
     }
 
     /**

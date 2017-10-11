@@ -8,6 +8,7 @@ $list = array();
 if ($response->Status !== "OK") {
     echo false;
 } else {
+    $list['kashflow_nominal_codes'] = "";
     foreach($response->GetNominalCodesResult->NominalCode as $nominal) {
         $list['kashflow_nominal_codes'][$nominal->id] = $nominal->Name;
     }

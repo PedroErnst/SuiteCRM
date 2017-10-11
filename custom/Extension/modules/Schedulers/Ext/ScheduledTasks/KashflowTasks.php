@@ -24,6 +24,22 @@ function getProducts() {
     }
 }
 
+function getInvoices() {
+
+    $kashflow = new Kashflow();
+    $response = $kashflow->getInvoicesByDateRange();
+    if ($response->Status == "OK") {
+        foreach($response->GetSubProductsResult->SubProduct as $product) {
+            // Find based on Kashflow ID
+            $productBean = new AOS_Products();
+            $productBean->retrieve_by_string_fields(array('kashflow_id' => $product->id));
+            if(!empty($productBean->id)) {
+                if (checkIfChanged($productBean, $product) == true) updateProduct($productBean, $product);
+            } else updateProduct($productBean, $product);
+        }
+    }
+}
+
 function updateProduct($productBean, $product) {
 
     $productBean->kashflow_id = $product->id;

@@ -6,16 +6,17 @@ $dictionary['Account']['fields']['kashflow_id'] = array(
     'len' => 18,
     'reportable' => false,
     'source' => 'db',
-    'precision' => 4,
+    'studio' => 'visible',
 );
 
 $dictionary['Account']['fields']['kashflow_code'] = array(
     'name' => 'kashflow_code',
     'vname' => 'LBL_KASHFLOW_CODE',
-    'type' => 'varchar',
+    'type' => 'id',
     'len' => 10,
     'reportable' => false,
     'source' => 'db',
+    'studio' => 'visible',
 );
 
 $dictionary['Account']['fields']['from_kashflow'] = array(
