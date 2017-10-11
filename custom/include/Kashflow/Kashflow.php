@@ -118,6 +118,11 @@ class Kashflow
         return $this->makeRequest("InsertInvoice", $parameters);
     }
 
+    public function updateInvoice($parameters)
+    {
+        return $this->makeRequest("UpdateInvoice", $parameters);
+    }
+
     public function insertInvoiceLine($parameters)
     {
 

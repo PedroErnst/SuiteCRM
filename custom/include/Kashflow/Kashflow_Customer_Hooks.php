@@ -22,17 +22,17 @@ class Kashflow_Customer_Hooks {
 
                 if($bean->load_relationship('contacts')) {
                     $contactBean = $bean->get_linked_beans('contacts','Contact');
-                    $this->sendCustomerDetails($bean, $contactBean[0], $kashflow);
+                    $this->sendCustomerDetails($bean, $kashflow);
                 }
             } elseif($bean->module_dir == "Contacts" && !empty($bean->account_id)) {
 
                 $accountBean = BeanFactory::getBean("Accounts", $bean->account_id);
-                $this->sendCustomerDetails($accountBean, $bean, $kashflow);
+                $this->sendCustomerDetails($accountBean, $kashflow, $bean);
             }
         }
     }
 
-    function sendCustomerDetails($account, $contact, $kashflow) {
+    function sendCustomerDetails($account, $kashflow, $contact = "") {
 
         if(!empty($account->kashflow_id) && !empty($account->kashflow_code)) {
             $customerCode['CustomerCode'] = $account->kashflow_code;
