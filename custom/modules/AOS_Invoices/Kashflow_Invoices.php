@@ -23,7 +23,19 @@ class Kashflow_Invoices {
                 if(!empty($bean->billing_contact_id)) {
                     $contactBean = BeanFactory::getBean("Contacts", $bean->billing_contact_id);
                     $kashflowAccount->sendCustomerDetails($accountBean, $kashflow, $contactBean);
-                } else $kashflowAccount->sendCustomerDetails($accountBean, $kashflow);
+                } else {
+                    if($accountBean->load_relationship('contacts')) {
+                        $contactBeans = $accountBean->get_linked_beans('contacts','Contact');
+                        foreach($contactBeans as $contact) {
+                            if($contact->billing_contact == true) {
+                                $billing_contact = $contact;
+                                break;
+                            }
+                        }
+                    }
+                    if (isset($billing_contact)) $kashflowAccount->sendCustomerDetails($accountBean, $kashflow, $billing_contact);
+                    else $kashflowAccount->sendCustomerDetails($accountBean, $kashflow);
+                }
             }
             if(!empty($bean->number)){
                 $response = $kashflow->getInvoice($bean->number);

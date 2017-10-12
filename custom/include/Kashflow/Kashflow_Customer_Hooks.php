@@ -19,13 +19,9 @@ class Kashflow_Customer_Hooks {
             $kashflow = new Kashflow();
 
             if($bean->module_dir == "Accounts"){
-
-                if($bean->load_relationship('contacts')) {
-                    $contactBean = $bean->get_linked_beans('contacts','Contact');
-                    $this->sendCustomerDetails($bean, $kashflow);
-                }
-            } elseif($bean->module_dir == "Contacts" && !empty($bean->account_id)) {
-
+                $this->sendCustomerDetails($bean, $kashflow);
+            }
+            elseif($bean->module_dir == "Contacts" && !empty($bean->account_id) && $bean->billing_contact == true) {
                 $accountBean = BeanFactory::getBean("Accounts", $bean->account_id);
                 $this->sendCustomerDetails($accountBean, $kashflow, $bean);
             }
@@ -43,11 +39,13 @@ class Kashflow_Customer_Hooks {
         $parameters['custr']->CustomerID = !empty($account->kashflow_id) ? $account->kashflow_id : 0;
         $parameters['custr']->Code = $account->kashflow_code;
         $parameters['custr']->Name = $account->name;
-        $parameters['custr']->ContactTitle = !empty($contact->salutation) ? $contact->salutation : "";
-        $parameters['custr']->ContactFirstName = !empty($contact->first_name) ? $contact->first_name : "";
-        $parameters['custr']->ContactLastName = !empty($contact->last_name) ? $contact->last_name : "";
+        if(!empty($contact)) {
+            $parameters['custr']->ContactTitle = !empty($contact->salutation) ? $contact->salutation : "";
+            $parameters['custr']->ContactFirstName = !empty($contact->first_name) ? $contact->first_name : "";
+            $parameters['custr']->ContactLastName = !empty($contact->last_name) ? $contact->last_name : "";
+            $parameters['custr']->Mobile = !empty($contact->mobile_phone) ? $contact->mobile_phone : "";
+        }
         $parameters['custr']->Telephone = !empty($account->phone_office) ? $account->phone_office : "";
-        $parameters['custr']->Mobile = !empty($contact->mobile_phone) ? $contact->mobile_phone : "";
         $parameters['custr']->Fax = !empty($account->fax) ? $account->fax : "";
         $parameters['custr']->Email = $account->email;
         $parameters['custr']->Address1 = $account->billing_address_street;
@@ -56,10 +54,8 @@ class Kashflow_Customer_Hooks {
         $parameters['custr']->Address4 = $account->billing_address_country;
         $parameters['custr']->Postcode = !empty($account->billing_address_postcode) ? $account->billing_address_postcode : "";
         $parameters['custr']->Website = $account->website;
-        $parameters['custr']->Updated = date('Y-m-d')."T00:00:00";
 
         if(empty($account->kashflow_id)) {
-            $parameters['custr']['Created'] = date('Y-m-d', $account->date_created)."T00:00:00";
             $parameters = $this->addDefaultEntries($parameters);
             $response = $kashflow->insertCustomer($parameters);
             if(!empty($response->InsertCustomerResult)) $account->kashflow_id = $response->InsertCustomerResult;
