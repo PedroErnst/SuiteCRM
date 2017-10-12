@@ -1,9 +1,12 @@
 <?php
 
 $job_strings[] = 'getProducts';
+$job_strings[] = 'getInvoices';
 
 require_once 'custom/include/Kashflow/Kashflow.php';
 require_once 'modules/AOS_Products/AOS_Products.php';
+require_once 'modules/AOS_Invoices/AOS_Invoices.php';
+require_once 'modules/Accounts/Account.php';
 
 function getProducts() {
     global $app_list_strings;
@@ -12,12 +15,13 @@ function getProducts() {
     foreach($app_list_strings['kashflow_nominal_codes'] as $code => $label) {
         $response = $kashflow->getSubProducts($code);
         if ($response->Status == "OK") {
+            if(!isset($response->GetSubProductsResult->SubProduct[0]))$response->GetSubProductsResult->SubProduct[0] = $response->GetSubProductsResult->SubProduct;
             foreach($response->GetSubProductsResult->SubProduct as $product) {
                 // Find based on Kashflow ID
                 $productBean = new AOS_Products();
                 $productBean->retrieve_by_string_fields(array('kashflow_id' => $product->id));
                 if(!empty($productBean->id)) {
-                    if (checkIfChanged($productBean, $product) == true) updateProduct($productBean, $product);
+                    if (checkIfChangedProduct($productBean, $product) == true) updateProduct($productBean, $product);
                 } else updateProduct($productBean, $product);
             }
         }
@@ -29,13 +33,13 @@ function getInvoices() {
     $kashflow = new Kashflow();
     $response = $kashflow->getInvoicesByDateRange();
     if ($response->Status == "OK") {
-        foreach($response->GetSubProductsResult->SubProduct as $product) {
+        foreach($response->GetInvoicesByDateRangeResult->Invoice as $invoice) {
             // Find based on Kashflow ID
-            $productBean = new AOS_Products();
-            $productBean->retrieve_by_string_fields(array('kashflow_id' => $product->id));
-            if(!empty($productBean->id)) {
-                if (checkIfChanged($productBean, $product) == true) updateProduct($productBean, $product);
-            } else updateProduct($productBean, $product);
+            $invoiceBean = new AOS_Invoices();
+            $invoiceBean->retrieve_by_string_fields(array('number' => $invoice->InvoiceNumber));
+            if(!empty($invoiceBean->id)) {
+                if (checkIfChangedInvoice($invoiceBean, $invoice) == true) updateInvoice($invoiceBean, $invoice);
+            } else updateInvoice($invoiceBean, $invoice);
         }
     }
 }
@@ -58,7 +62,7 @@ function updateProduct($productBean, $product) {
     $productBean->save();
 }
 
-function checkIfChanged($productBean, $product) {
+function checkIfChangedProduct($productBean, $product) {
     $changed = false;
     if($productBean->kashflow_id != $product->id) $changed = true;
     if($productBean->nominal_code != $product->ParentID) $changed = true;
@@ -72,5 +76,41 @@ function checkIfChanged($productBean, $product) {
     if($productBean->qty_in_stock != $product->QtyInStock) $changed = true;
     if($productBean->stock_warn_qty != $product->StockWarnQty) $changed = true;
     if($productBean->autofill != $product->AutoFill) $changed = true;
+    return $changed;
+}
+
+function updateInvoice($invoiceBean, $invoice) {
+
+    $invoiceDate = substr($invoice->InvoiceDate, 0, 10);
+    $dueDate = substr($invoice->DueDate, 0, 10);
+    $accountBean = new Account();
+    $accountBean->retrieve_by_string_fields(array('kashflow_id' => $invoice->CustomerID));
+
+    $invoiceBean->number = $invoice->InvoiceNumber;
+    $invoiceBean->name = $invoice->CustomerName;
+    $invoiceBean->invoice_date = $invoiceDate;
+    $invoiceBean->due_date = $dueDate;
+    $invoiceBean->status = $invoice->Paid == 1 ? "Paid" : "Unpaid";
+    $invoiceBean->billing_account_id = $accountBean->id;
+    $invoiceBean->total_amount = $invoice->NetAmount;
+    $invoiceBean->tax_amount = $invoice->VATAmount;
+    $invoiceBean->amount_paid = $invoice->AmountPaid;
+    $invoiceBean->from_kashflow = true;
+    $invoiceBean->save();
+}
+
+function checkIfChangedInvoice($invoiceBean, $invoice) {
+    $changed = false;
+    $accountBean = new Account();
+    $accountBean->retrieve_by_string_fields(array('kashflow_id' => $invoice->CustomerID));
+
+    if($invoiceBean->invoice_date."T00:00:00" != $invoice->InvoiceDate) $changed = true;
+    if($invoiceBean->due_date."T00:00:00" != $invoice->DueDate) $changed = true;
+    if($invoiceBean->billing_account_id != $accountBean->id) $changed = true;
+    if($invoiceBean->total_amount != $invoice->NetAmount) $changed = true;
+    if($invoiceBean->tax_amount != $invoice->VATAmount) $changed = true;
+    if($invoiceBean->amount_paid != $invoice->AmountPaid) $changed = true;
+    if(($invoiceBean->status == "Paid" && $invoice->Paid != 1) ||
+       ($invoiceBean->status != "Paid" && $invoice->Paid == 1)) $changed = true;
     return $changed;
 }

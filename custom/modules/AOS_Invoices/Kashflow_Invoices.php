@@ -44,8 +44,8 @@ class Kashflow_Invoices {
                 $parameters['Inv']['DueDate'] = $bean->due_date."T00:00:00";
                 $parameters['Inv']['CustomerID'] = (int)$accountBean->kashflow_id;
                 $parameters['Inv']['Paid'] = $bean->status == "Paid" ? 1 : 0;
-                $parameters['Inv']['NetAmount'] = !empty($bean->grand_total) ? $bean->grand_total : "0.0000";
-                $parameters['Inv']['VATAmount'] = !empty($bean->tax) ? $bean->tax : "0.0000";
+                $parameters['Inv']['NetAmount'] = !empty($bean->total_amount) ? $bean->total_amount : "0.0000";
+                $parameters['Inv']['VATAmount'] = !empty($bean->tax_amount) ? $bean->tax_amount : "0.0000";
                 $parameters['Inv']['AmountPaid'] = !empty($bean->amount_paid) ? $bean->amount_paid : "0.0000";
                 $response = $kashflow->updateInvoice($parameters);
             } else {
@@ -60,8 +60,8 @@ class Kashflow_Invoices {
                     "SuppressTotal" => 0,
                     "ProjectID"     => 0,
                     "ExchangeRate"  => "0.0000",
-                    "NetAmount"     => !empty($bean->grand_total) ? $bean->grand_total : "0.0000",
-                    "VATAmount"     => !empty($bean->tax) ? $bean->tax : "0.0000",
+                    "NetAmount"     => !empty($bean->total_amount) ? $bean->total_amount : "0.0000",
+                    "VATAmount"     => !empty($bean->tax_amount) ? $bean->tax_amount : "0.0000",
                     "AmountPaid"    => !empty($bean->amount_paid) ? $bean->amount_paid : "0.0000",
                     "UseCustomDeliveryAddress"  => false,
                 );

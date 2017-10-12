@@ -132,7 +132,7 @@ class Kashflow
     /**
      * @return mixed
      */
-    public function getInvoice()
+    public function getInvoice($parameters)
     {
         $test = 0;
         $parameters = "";
@@ -147,7 +147,9 @@ class Kashflow
      */
     public function getInvoicesByDateRange()
     {
-        return $this->makeRequest("GetInvoicesByDateRange");
+        $parameters['StartDate'] = "2000-01-01T00:00:00";
+        $parameters['EndDate'] = date('Y-m-d')."T00:00:00";
+        return $this->makeRequest("GetInvoicesByDateRange", $parameters);
     }
 
     public function getCustomer($parameters)
