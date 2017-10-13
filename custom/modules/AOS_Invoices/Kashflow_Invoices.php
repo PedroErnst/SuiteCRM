@@ -16,7 +16,6 @@ class Kashflow_Invoices {
              ($sugar_config['kashflow_api']['send_invoices_option'] == 'new' && $bean->date_entered == $bean->date_modified) ||
               $sugar_config['kashflow_api']['send_invoices_option'] == 'all')) {
             $kashflow = new Kashflow();
-
             if(!empty($bean->billing_account_id)) {
                 $accountBean = BeanFactory::getBean("Accounts", $bean->billing_account_id);
                 $kashflowAccount = new Kashflow_Customer_Hooks();
@@ -39,14 +38,14 @@ class Kashflow_Invoices {
             }
             if(!empty($bean->number)){
                 $response = $kashflow->getInvoice($bean->number);
-                $parameters['Inv'] = $response->GetInvoiceResults;
-                $parameters['Inv']['InvoiceDate'] = $bean->invoice_date."T00:00:00";
-                $parameters['Inv']['DueDate'] = $bean->due_date."T00:00:00";
-                $parameters['Inv']['CustomerID'] = (int)$accountBean->kashflow_id;
-                $parameters['Inv']['Paid'] = $bean->status == "Paid" ? 1 : 0;
-                $parameters['Inv']['NetAmount'] = !empty($bean->total_amount) ? $bean->total_amount : "0.0000";
-                $parameters['Inv']['VATAmount'] = !empty($bean->tax_amount) ? $bean->tax_amount : "0.0000";
-                $parameters['Inv']['AmountPaid'] = !empty($bean->amount_paid) ? $bean->amount_paid : "0.0000";
+                $parameters['Inv'] = $response->GetInvoiceResult;
+                $parameters['Inv']->InvoiceDate = $bean->invoice_date."T00:00:00";
+                $parameters['Inv']->DueDate = $bean->due_date."T00:00:00";
+                $parameters['Inv']->CustomerID = (int)$accountBean->kashflow_id;
+                $parameters['Inv']->Paid = $bean->status == "Paid" ? 1 : 0;
+                $parameters['Inv']->NetAmount = !empty($bean->total_amount) ? $bean->total_amount : "0.0000";
+                $parameters['Inv']->VATAmount = !empty($bean->tax_amount) ? $bean->tax_amount : "0.0000";
+                $parameters['Inv']->AmountPaid = !empty($bean->amount_paid) ? $bean->amount_paid : "0.0000";
                 $response = $kashflow->updateInvoice($parameters);
             } else {
                 $parameters['Inv'] = array

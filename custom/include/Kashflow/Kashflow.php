@@ -125,20 +125,15 @@ class Kashflow
 
     public function insertInvoiceLine($parameters)
     {
-
-        return $this->makeRequest("InsertInvoiceLine", $parameters);
+        return $this->makeRequest("InsertInvoiceLineWithInvoiceNumber", $parameters);
     }
 
     /**
      * @return mixed
      */
-    public function getInvoice($parameters)
+    public function getInvoice($number)
     {
-        $test = 0;
-        $parameters = "";
-        if($test != 0) {
-            $parameters['InvoiceNumber'] = 1;
-        }
+        $parameters['InvoiceNumber'] = $number;
         return $this->makeRequest("GetInvoice", $parameters);
     }
 
