@@ -36,33 +36,38 @@ class Kashflow_Invoices {
                     else $kashflowAccount->sendCustomerDetails($accountBean, $kashflow);
                 }
             }
-            $bean->load_relationships();
-            if($bean->aos_products_quotes->getBeans()) {
-                foreach($bean->aos_products_quotes->beans as $line_item) {
-                    if($line_item->product_id) {
-                        $product = new AOS_Products();
-                        $product->retrieve_by_string_fields(array('id' => $line_item->product_id));
-                    }
-                    $line = array
-                    (
-                        "LineID" => 0,
-                        "Quantity" => $line_item->product_qty,
-                        "Description" => !empty($line_item->item_description) ? $line_item->item_description : "",
-                        "Rate" => $line_item->product_unit_price,
-                        "ChargeType" => !empty($product->nominal_code) ? (int)$product->nominal_code : 0,
-                        "VatAmount" => !empty($line_item->product_vat_amt) ? $line_item->product_vat_amt : 0,
-                        "VatRate" => !empty($line_item->product_vat) ? $line_item->product_vat : 0,
-                        "Sort" => $line_item->number,
-                        "ProductID" => !empty($product->kashflow_id) ? (int)$product->kashflow_id : 0,
-                        "ValuesInCurrency" => 0,
-                        "ProjID" => 0,
-                    );
-                    $lines[] = new SoapVar($line,0,"InvoiceLine","KashFlow");
-                }
-            }
-            if(empty($lines)) $lines = new SoapVar(array(), 0,"InvoiceLine","KashFlow");
+            $lines = new SoapVar(array(), 0,"InvoiceLine","KashFlow");
             $response = $kashflow->getInvoice($bean->number);
             if($response->GetInvoiceResult->InvoiceDBID != 0){
+
+                // HANDLE EXISTING LINE ITEMS
+                if(!empty($response->GetInvoiceResult->Lines)) {
+                    foreach($response->GetInvoiceResult->Lines as $row) {
+                        if ($row->LineID) {
+                            $line_item = new AOS_Products_Quotes();
+                            $line_item->retrieve_by_string_fields(array('kashflow_id' => $row->LineID));
+                        }
+                        if ($row->ProductID) {
+                            $product = new AOS_Products();
+                            $product->retrieve_by_string_fields(array('kashflow_id' => $row->ProductID));
+                        }
+                        $line = array(
+                            "LineID"           => !empty($line_item->kashflow_id) ? $line_item->kashflow_id : 0,
+                            "Quantity"         => !empty($line_item->product_qty) ? $line_item->product_qty : $row->Quantity,
+                            "Description"      => !empty($line_item->item_description) ? $line_item->item_description : $row->Description,
+                            "Rate"             => !empty($line_item->product_unit_price) ? $line_item->product_unit_price : $row->Rate,
+                            "ChargeType"       => !empty($product->nominal_code) ? (int)$product->nominal_code : $row->ChargeType,
+                            "VatAmount"        => !empty($line_item->product_vat_amt) ? $line_item->product_vat_amt : $row->VatAmount,
+                            "VatRate"          => !empty($line_item->product_vat) ? $line_item->product_vat : $row->VatRate,
+                            "Sort"             => !empty($line_item->number) ? $line_item->number : $row->Sort,
+                            "ProductID"        => !empty($product->kashflow_id) ? (int)$product->kashflow_id : $row->ProductID,
+                            "ValuesInCurrency" => 0,
+                            "ProjID"           => 0,
+                        );
+                        $lines[] = new SoapVar($line, 0, "InvoiceLine", "KashFlow");
+                    }
+                }
+
                 $parameters['Inv'] = $response->GetInvoiceResult;
                 $parameters['Inv']->InvoiceDate = $bean->invoice_date."T00:00:00";
                 $parameters['Inv']->DueDate = $bean->due_date."T00:00:00";
@@ -73,7 +78,57 @@ class Kashflow_Invoices {
                 $parameters['Inv']->VATAmount = !empty($bean->tax_amount) ? $bean->tax_amount : "0.0000";
                 $parameters['Inv']->AmountPaid = !empty($bean->amount_paid) ? $bean->amount_paid : "0.0000";
                 $response = $kashflow->updateInvoice($parameters);
+
+                // ADD NEW INVOICE LINE ITEMS
+                $bean->load_relationships();
+                if($bean->aos_products_quotes->getBeans()) {
+                    foreach ($bean->aos_products_quotes->beans as $line_item) {
+                        if ($line_item->product_id) {
+                            $product = new AOS_Products();
+                            $product->retrieve_by_string_fields(array('id' => $line_item->product_id));
+                        }
+                        $line['InvLine'] = array(
+                            "LineID"           => 0,
+                            "Quantity"         => $line_item->product_qty,
+                            "Description"      => !empty($line_item->item_description) ? $line_item->item_description : "",
+                            "Rate"             => $line_item->product_unit_price,
+                            "ChargeType"       => !empty($product->nominal_code) ? (int)$product->nominal_code : 0,
+                            "VatAmount"        => !empty($line_item->product_vat_amt) ? $line_item->product_vat_amt : 0,
+                            "VatRate"          => !empty($line_item->product_vat) ? $line_item->product_vat : 0,
+                            "Sort"             => $line_item->number,
+                            "ProductID"        => !empty($product->kashflow_id) ? (int)$product->kashflow_id : 0,
+                            "ValuesInCurrency" => 0,
+                            "ProjID"           => 0,
+                        );
+                        $response = $kashflow->insertInvoiceLine($line);
+                        if(!empty($response->InsertInvoiceLineWithInvoiceNumberResult)) $line_item->kashflow_id = $response->InsertInvoiceLineWithInvoiceNumberResult;
+                    }
+                }
             } else {
+                // NEW INVOICE - PREP LINE ITEMS
+                $bean->load_relationships();
+                if($bean->aos_products_quotes->getBeans()) {
+                    foreach ($bean->aos_products_quotes->beans as $line_item) {
+                        if ($line_item->product_id) {
+                            $product = new AOS_Products();
+                            $product->retrieve_by_string_fields(array('id' => $line_item->product_id));
+                        }
+                        $line = array(
+                            "LineID"           => 0,
+                            "Quantity"         => $line_item->product_qty,
+                            "Description"      => !empty($line_item->item_description) ? $line_item->item_description : "",
+                            "Rate"             => $line_item->product_unit_price,
+                            "ChargeType"       => !empty($product->nominal_code) ? (int)$product->nominal_code : 0,
+                            "VatAmount"        => !empty($line_item->product_vat_amt) ? $line_item->product_vat_amt : 0,
+                            "VatRate"          => !empty($line_item->product_vat) ? $line_item->product_vat : 0,
+                            "Sort"             => $line_item->number,
+                            "ProductID"        => !empty($product->kashflow_id) ? (int)$product->kashflow_id : 0,
+                            "ValuesInCurrency" => 0,
+                            "ProjID"           => 0,
+                        );
+                        $lines[] = new SoapVar($line, 0, "InvoiceLine", "KashFlow");
+                    }
+                }
                 $parameters['Inv'] = array
                 (
                     "InvoiceDBID"   => 0,
