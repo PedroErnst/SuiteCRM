@@ -15,14 +15,20 @@ function getProducts() {
     foreach($app_list_strings['kashflow_nominal_codes'] as $code => $label) {
         $response = $kashflow->getSubProducts($code);
         if ($response->Status == "OK") {
-            if(!isset($response->GetSubProductsResult->SubProduct[0]))$response->GetSubProductsResult->SubProduct[0] = $response->GetSubProductsResult->SubProduct;
-            foreach($response->GetSubProductsResult->SubProduct as $product) {
-                // Find based on Kashflow ID
-                $productBean = new AOS_Products();
-                $productBean->retrieve_by_string_fields(array('kashflow_id' => $product->id));
-                if(!empty($productBean->id)) {
-                    if (checkIfChangedProduct($productBean, $product) == true) updateProduct($productBean, $product);
-                } else updateProduct($productBean, $product);
+            $productsArray = "";
+            if(!empty($response->GetSubProductsResult->SubProduct->id))
+                $productsArray[] = $response->GetSubProductsResult->SubProduct;
+            else
+                $productsArray = $response->GetSubProductsResult->SubProduct;
+            foreach($productsArray as $product) {
+                if(!empty($product->id)) {
+                    // Find based on Kashflow ID
+                    $productBean = new AOS_Products();
+                    $productBean->retrieve_by_string_fields(array('kashflow_id' => $product->id));
+                    if(!empty($productBean->id)) {
+                        if (checkIfChangedProduct($productBean, $product) == true) updateProduct($productBean, $product);
+                    } else updateProduct($productBean, $product);
+                }
             }
         }
     }

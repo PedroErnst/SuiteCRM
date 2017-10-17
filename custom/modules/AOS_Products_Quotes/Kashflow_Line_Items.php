@@ -31,6 +31,11 @@ class Kashflow_Line_Items{
             $row = mysqli_fetch_assoc($result);
 
             $parameters['InvoiceNumber'] = $invoice->number;
+            if(!empty($row['kashflow_id'])) {
+                $parameters['LineID'] = (int)$row['kashflow_id'];
+                $kashflow->deleteInvoiceLine($parameters);
+            }
+
             $parameters['InvLine'] = array (
                 "LineID" => !empty($row['kashflow_id']) ? (int)$row['kashflow_id'] : 0,
                 "Quantity" => $bean->product_qty,

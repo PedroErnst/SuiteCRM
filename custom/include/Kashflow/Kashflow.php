@@ -128,6 +128,11 @@ class Kashflow
         return $this->makeRequest("InsertInvoiceLineWithInvoiceNumber", $parameters);
     }
 
+    public function deleteInvoiceLine($parameters)
+    {
+        return $this->makeRequest("DeleteInvoiceLine", $parameters);
+    }
+
     /**
      * @return mixed
      */

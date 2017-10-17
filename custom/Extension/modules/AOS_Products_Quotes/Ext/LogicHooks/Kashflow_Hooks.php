@@ -28,4 +28,4 @@ if (!isset($hook_array) || !is_array($hook_array)) {
 if (!isset($hook_array['before_save']) || !is_array($hook_array['before_save'])) {
     $hook_array['before_save'] = array();
 }
-$hook_array['before_save'][] = Array(19, 'Add or Update Invoice Lines', 'custom/modules/AOS_Products_Quotes/Kashflow_Line_Items.php','Kashflow_Line_Items', 'addOrUpdateInvoiceLine');
+//$hook_array['before_save'][] = Array(19, 'Add or Update Invoice Lines', 'custom/modules/AOS_Products_Quotes/Kashflow_Line_Items.php','Kashflow_Line_Items', 'addOrUpdateInvoiceLine');
