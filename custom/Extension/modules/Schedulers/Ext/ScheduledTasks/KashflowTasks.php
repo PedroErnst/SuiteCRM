@@ -5,6 +5,7 @@ $job_strings[] = 'getInvoices';
 
 require_once 'custom/include/Kashflow/Kashflow.php';
 require_once 'modules/AOS_Products/AOS_Products.php';
+require_once 'modules/AOS_Products_Quotes/AOS_Products_Quotes.php';
 require_once 'modules/AOS_Invoices/AOS_Invoices.php';
 require_once 'modules/Accounts/Account.php';
 
@@ -39,13 +40,19 @@ function getInvoices() {
     $kashflow = new Kashflow();
     $response = $kashflow->getInvoicesByDateRange();
     if ($response->Status == "OK") {
-        foreach($response->GetInvoicesByDateRangeResult->Invoice as $invoice) {
+        $invoiceArray = "";
+        if(!empty($response->GetInvoicesByDateRangeResult->Invoice->InvoiceDBID))
+            $invoiceArray[] = $response->GetInvoicesByDateRangeResult->Invoice;
+        else
+            $invoiceArray = $response->GetInvoicesByDateRangeResult->Invoice;
+        foreach($invoiceArray as $invoice) {
             // Find based on Kashflow ID
             $invoiceBean = new AOS_Invoices();
             $invoiceBean->retrieve_by_string_fields(array('number' => $invoice->InvoiceNumber));
             if(!empty($invoiceBean->id)) {
                 if (checkIfChangedInvoice($invoiceBean, $invoice) == true) updateInvoice($invoiceBean, $invoice);
             } else updateInvoice($invoiceBean, $invoice);
+            updateLineItems($invoiceBean, $invoice);
         }
     }
 }
@@ -119,4 +126,29 @@ function checkIfChangedInvoice($invoiceBean, $invoice) {
     if(($invoiceBean->status == "Paid" && $invoice->Paid != 1) ||
        ($invoiceBean->status != "Paid" && $invoice->Paid == 1)) $changed = true;
     return $changed;
+}
+
+function updateLineItems($invoiceBean, $invoice) {
+    if(!empty($invoice->Lines)) {
+        foreach($invoice->Lines as $line) {
+            $values = $line->enc_value;
+            $line_item = new AOS_Products_Quotes();
+            $line_item->retrieve_by_string_fields(array("kashflow_id" => $values->LineID));
+            $product = new AOS_Products();
+            $product->retrieve_by_string_fields(array("nominal_code" => $values->ChargeType, "kashflow_id" => $values->ProductID));
+            $line_item->product_qty = $values->Quantity;
+            $line_item->item_description = $values->Description;
+            $line_item->product_unit_price = $values->Rate;
+            $line_item->product_vat = $values->VatRate;
+            $line_item->product_vat_amt = $values->VatAmount;
+            $line_item->number = $values->Sort;
+            $line_item->kashflow_id = $values->LineID;
+            $line_item->product_id = $product->id;
+            $line_item->name = $product->name;
+            $line_item->part_number = $product->part_number;
+            $line_item->parent_type = "AOS_Invoices";
+            $line_item->parent_id = $invoiceBean->id;
+            $line_item->save();
+        }
+    }
 }
