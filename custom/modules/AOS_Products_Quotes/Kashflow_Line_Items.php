@@ -16,42 +16,42 @@ class Kashflow_Line_Items{
         if ($sugar_config['kashflow_api']['send_invoices'] == 1 && $bean->from_kashflow == false &&
             (($sugar_config['kashflow_api']['send_invoices_option'] == 'modified' && $bean->date_entered != $bean->date_modified) ||
              ($sugar_config['kashflow_api']['send_invoices_option'] == 'new' && $bean->date_entered == $bean->date_modified) ||
-              $sugar_config['kashflow_api']['send_invoices_option'] == 'all')) {
+              $sugar_config['kashflow_api']['send_invoices_option'] == 'all' && $bean->deleted == 0)) {
             $kashflow = new Kashflow();
 
-            if($bean->product_id) {
-                $product = new AOS_Products();
-                $product->retrieve_by_string_fields(array('id' => $bean->product_id));
+            if (empty($bean->kashflow_id)) {
+                if($bean->product_id) {
+                    $product = new AOS_Products();
+                    $product->retrieve_by_string_fields(array('id' => $bean->product_id));
+                }
+                $invoice = new AOS_Invoices();
+                $invoice->retrieve_by_string_fields(array('id' => $bean->parent_id));
+
+                $line['InvoiceNumber'] = $invoice->number;
+                $line['InvLine'] = array(
+                    "LineID"           => 0,
+                    "Quantity"         => $bean->product_qty,
+                    "Description"      => !empty($bean->item_description) ? $bean->item_description : "",
+                    "Rate"             => $bean->product_unit_price,
+                    "ChargeType"       => !empty($product->nominal_code) ? (int)$product->nominal_code : 0,
+                    "VatAmount"        => !empty($bean->product_vat_amt) ? $bean->product_vat_amt : 0,
+                    "VatRate"          => !empty($bean->product_vat) ? $bean->product_vat : 0,
+                    "Sort"             => $bean->number,
+                    "ProductID"        => !empty($product->kashflow_id) ? (int)$product->kashflow_id : 0,
+                    "ValuesInCurrency" => 0,
+                    "ProjID"           => 0,
+                );
+                $response = $kashflow->insertInvoiceLine($line);
+                if (!empty($response->InsertInvoiceLineWithInvoiceNumberResult)) {
+                    $sql =
+                        "UPDATE aos_products_quotes SET kashflow_id = '" .
+                        $response->InsertInvoiceLineWithInvoiceNumberResult .
+                        "' WHERE id = '" .
+                        $bean->id .
+                        "'";
+                    $bean->db->query($sql);
+                }
             }
-            $invoice = new AOS_Invoices();
-            $invoice->retrieve_by_string_fields(array('id' => $bean->parent_id));
-
-            $sql = "SELECT kashflow_id FROM aos_products_quotes WHERE id = '".$bean->id."'";
-            $result = $bean->db->query($sql);
-            $row = mysqli_fetch_assoc($result);
-
-            $parameters['InvoiceNumber'] = $invoice->number;
-            if(!empty($row['kashflow_id'])) {
-                $parameters['LineID'] = (int)$row['kashflow_id'];
-                $kashflow->deleteInvoiceLine($parameters);
-            }
-
-            $parameters['InvLine'] = array (
-                "LineID" => !empty($row['kashflow_id']) ? (int)$row['kashflow_id'] : 0,
-                "Quantity" => $bean->product_qty,
-                "Description" => !empty($bean->product_description) ? $bean->product_description : "",
-                "Rate" => $bean->product_unit_price,
-                "ChargeType" => !empty($product->nominal_code) ? (int)$product->nominal_code : 0,
-                "VatAmount" => !empty($bean->product_vat_amt) ? $bean->product_vat_amt : 0,
-                "VatRate" => !empty($bean->product_vat) ? $bean->product_vat : 0,
-                "Sort" => $bean->number,
-                "ProductID" => !empty($product->kashflow_id) ? (int)$product->kashflow_id : 0,
-                "ValuesInCurrency" => 0,
-                "ProjID" => 0,
-            );
-
-            $response = $kashflow->insertInvoiceLine($parameters);
-            if(!empty($response->InsertInvoiceLineWithInvoiceNumberResult)) $bean->kashflow_id = $response->InsertInvoiceLineWithInvoiceNumberResult;
         }
     }
 }
