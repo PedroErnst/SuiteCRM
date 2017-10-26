@@ -10,7 +10,7 @@ class Kashflow_Invoices {
      */
     function addOrUpdateInvoice($bean, $event, $arguments)
     {
-        global $sugar_config;
+        global $sugar_config, $app_strings;
         if ($sugar_config['kashflow_api']['send_invoices'] == 1 && $bean->from_kashflow == false &&
             (($sugar_config['kashflow_api']['send_invoices_option'] == 'modified' && $bean->date_entered != $bean->date_modified) ||
              ($sugar_config['kashflow_api']['send_invoices_option'] == 'new' && $bean->date_entered == $bean->date_modified) ||
@@ -133,7 +133,7 @@ class Kashflow_Invoices {
                     $bean->db->query($sql);
                 }
             }
-            if($response->Status == "NO") SugarApplication::appendErrorMessage('LBL_FAILED_TO_SEND');
+            if($response->Status == "NO") SugarApplication::appendErrorMessage($app_strings['LBL_FAILED_KASHFLOW_INVOICES']);
         }
     }
 }

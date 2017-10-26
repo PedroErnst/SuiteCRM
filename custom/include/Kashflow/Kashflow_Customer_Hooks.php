@@ -30,10 +30,11 @@ class Kashflow_Customer_Hooks {
 
     function sendCustomerDetails($account, $kashflow, $contact = "") {
 
-        if(!empty($account->kashflow_id) && !empty($account->kashflow_code)) {
-            $customerCode['CustomerCode'] = $account->kashflow_code;
-            $customer = $kashflow->getCustomer($customerCode);
-            $parameters['custr'] = $customer->GetCustomerResult;
+        global $app_strings;
+        if(!empty($account->kashflow_id)) {
+            $customerCode['CustomerCode'] = $account->kashflow_id;
+            $customer = $kashflow->getCustomerByID($customerCode);
+            $parameters['custr'] = $customer->GetCustomerByIDResult;
         }
 
         $parameters['custr']->CustomerID = !empty($account->kashflow_id) ? $account->kashflow_id : 0;
@@ -59,10 +60,10 @@ class Kashflow_Customer_Hooks {
             $parameters = $this->addDefaultEntries($parameters, $account);
             $response = $kashflow->insertCustomer($parameters);
             if(!empty($response->InsertCustomerResult)) $account->kashflow_id = $response->InsertCustomerResult;
-            if($response->Status == "NO") SugarApplication::appendErrorMessage('LBL_FAILED_TO_SEND');
+            if($response->Status == "NO") SugarApplication::appendErrorMessage($app_strings['LBL_FAILED_KASHFLOW_CUSTOMER']);
         } else {
             $response = $kashflow->updateCustomer($parameters);
-            if($response->Status == "NO") SugarApplication::appendErrorMessage('LBL_FAILED_TO_SEND');
+            if($response->Status == "NO") SugarApplication::appendErrorMessage($app_strings['LBL_FAILED_KASHFLOW_CUSTOMER']);
         }
     }
 

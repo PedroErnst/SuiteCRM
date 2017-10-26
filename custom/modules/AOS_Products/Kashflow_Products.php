@@ -9,7 +9,7 @@ class Kashflow_Products {
      */
     function addOrUpdateSubProduct($bean, $event, $arguments)
     {
-        global $sugar_config;
+        global $sugar_config, $app_strings;
         if ($sugar_config['kashflow_api']['send_products'] == 1 && $bean->from_kashflow == false &&
             (($sugar_config['kashflow_api']['send_products_option'] == 'modified' && $bean->date_entered != $bean->date_modified) ||
              ($sugar_config['kashflow_api']['send_products_option'] == 'new' && $bean->date_entered == $bean->date_modified) ||
@@ -32,7 +32,7 @@ class Kashflow_Products {
             );
             $response = $kashflow->addOrUpdateSubProduct($parameters);
             if(!empty($response->AddOrUpdateSubProductResult)) $bean->kashflow_id = $response->AddOrUpdateSubProductResult;
-            if($response->Status == "NO") SugarApplication::appendErrorMessage('LBL_FAILED_TO_SEND');
+            if($response->Status == "NO") SugarApplication::appendErrorMessage($app_strings['LBL_FAILED_KASHFLOW_PRODUCTS']);
         }
     }
 }

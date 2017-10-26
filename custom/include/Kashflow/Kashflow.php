@@ -64,12 +64,9 @@ class Kashflow
      * @param $response
      *
      * @return mixed
-     * @throws Exception
      */
     private static function handleResponse($response)
     {
-        if($response->Status == "NO")
-            throw(new Exception($response->StatusDetail));
         return $response;
     }
 
@@ -78,43 +75,6 @@ class Kashflow
      */
     public function insertInvoice($parameters)
     {
-        $test = 0;
-        if($test != 0) {
-            $line = array
-            (
-                "LineID"      => 0,
-                "Quantity"    => 1,
-                "Description" => "description",
-                "Rate"        => 9,
-                "ChargeType"  => 0,
-                "VatAmount"   => 0,
-                "VatRate"     => 0,
-                "Sort"        => 1,
-                "ProductID"   => 0,
-                "ProjID"      => 0,
-            );
-
-            $lines[] = new SoapVar($line,0,"InvoiceLine","KashFlow");
-
-            $parameters['Inv'] = array
-            (
-                "InvoiceDBID"   => 91828459,
-                "InvoiceNumber" => 3,
-                "InvoiceDate"   => "2017-09-20T00:00:00",
-                "DueDate"       => "2017-09-30T00:00:00",
-                "CustomerID"    => 72177290,
-                "Paid"          => 0,
-                "SuppressTotal" => 0,
-                "ProjectID"     => 0,
-                "ExchangeRate"  => "0.0000",
-                "Lines"         => $lines,
-                "NetAmount"     => "0.0000",
-                "VATAmount"     => "0.0000",
-                "AmountPaid"    => "0.0000",
-                "UseCustomDeliveryAddress"  => false,
-            );
-        }
-
         return $this->makeRequest("InsertInvoice", $parameters);
     }
 
@@ -152,9 +112,9 @@ class Kashflow
         return $this->makeRequest("GetInvoicesByDateRange", $parameters);
     }
 
-    public function getCustomer($parameters)
+    public function getCustomerByID($parameters)
     {
-        return $this->makeRequest("GetCustomer", $parameters);
+        return $this->makeRequest("GetCustomerByID", $parameters);
     }
 
     public function getCustomers()
@@ -177,25 +137,6 @@ class Kashflow
      */
     public function addOrUpdateSubProduct($parameters = "")
     {
-        $test = 0;
-        if($test != 0) {
-            $parameters['sp'] = array
-            (
-                "id"            => 0,
-                "ParentID"      => 22784360,
-                "Name"          => "Product Test 2",
-                "Code"          => "PROD02",
-                "Description"   => "test",
-                "Price"         => 10,
-                "VatRate"       => "0.0000",
-                "WholesalePrice"=> "0.0000",
-                "Managed"       => 0,
-                "QtyInStock"    => 10,
-                "StockWarnQty"  => 0,
-                "AutoFill"      => 0
-            );
-        }
-
         return $this->makeRequest("AddOrUpdateSubProduct", $parameters);
     }
 
@@ -204,12 +145,8 @@ class Kashflow
      */
     public function getSubProducts($code)
     {
-        $test = 0;
         $parameters = "";
         $parameters['NominalID'] = $code;
-        if($test != 0) {
-            $parameters['NominalID'] = 22784360;
-        }
         return $this->makeRequest("GetSubProducts", $parameters);
     }
 
