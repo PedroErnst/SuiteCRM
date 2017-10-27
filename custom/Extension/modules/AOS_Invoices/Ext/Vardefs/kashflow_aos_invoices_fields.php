@@ -9,6 +9,16 @@ $dictionary['AOS_Invoices']['fields']['amount_paid'] = array(
     'readonly' => true
 );
 
+$dictionary['AOS_Invoices']['fields']['kashflow_id'] = array(
+    'name' => 'kashflow_id',
+    'vname' => 'LBL_KASHFLOW_ID',
+    'type' => 'id',
+    'len' => 18,
+    'reportable' => false,
+    'source' => 'db',
+    'studio' => 'visible',
+    'readonly' => true
+);
 
 $dictionary['AOS_Invoices']['fields']['from_kashflow'] = array(
     'name' => 'from_kashflow',

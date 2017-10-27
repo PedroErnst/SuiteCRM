@@ -7,6 +7,7 @@ $dictionary['Account']['fields']['kashflow_id'] = array(
     'reportable' => false,
     'source' => 'db',
     'studio' => 'visible',
+    'readonly' => true
 );
 
 $dictionary['Account']['fields']['kashflow_code'] = array(
