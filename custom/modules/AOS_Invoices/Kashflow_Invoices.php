@@ -84,7 +84,8 @@ class Kashflow_Invoices {
                 $parameters['Inv']->NetAmount = !empty($bean->total_amount) ? $bean->total_amount : "0.0000";
                 $parameters['Inv']->VATAmount = !empty($bean->tax_amount) ? $bean->tax_amount : "0.0000";
                 $parameters['Inv']->AmountPaid = !empty($bean->amount_paid) ? $bean->amount_paid : "0.0000";
-                $response = $kashflow->updateInvoice($parameters);
+                if(!empty($bean->due_date)) $response = $kashflow->updateInvoice($parameters);
+                else SugarApplication::appendErrorMessage($app_strings['LBL_FAILED_KASHFLOW_INVOICES']);
             } else {
                 // NEW INVOICE - PREP LINE ITEMS
                 $bean->load_relationships();
@@ -127,7 +128,8 @@ class Kashflow_Invoices {
                     "AmountPaid"    => !empty($bean->amount_paid) ? $bean->amount_paid : "0.0000",
                     "UseCustomDeliveryAddress"  => false,
                 );
-                $response = $kashflow->insertInvoice($parameters);
+                if(!empty($bean->due_date)) $response = $kashflow->insertInvoice($parameters);
+                else SugarApplication::appendErrorMessage($app_strings['LBL_FAILED_KASHFLOW_INVOICES']);
                 if(!empty($response->InsertInvoiceResult)){
                     $sql = "UPDATE aos_invoices SET number = '".$response->InsertInvoiceResult."' WHERE id = '".$bean->id."'";
                     $bean->db->query($sql);
