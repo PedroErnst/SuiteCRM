@@ -31,7 +31,7 @@ class Kashflow_Products {
                 "AutoFill"      => $bean->autofill == true ? 1 : 0
             );
             if(!empty($bean->nominal_code) && !empty($bean->name) && !empty($bean->part_number)) $response = $kashflow->addOrUpdateSubProduct($parameters);
-            else SugarApplication::appendErrorMessage($app_strings['LBL_FAILED_KASHFLOW_PRODUCTS']);
+            else SugarApplication::appendErrorMessage($app_strings['LBL_FAILED_KASHFLOW_PRODUCTS_FIELDS']);
             if(!empty($response->AddOrUpdateSubProductResult)) $bean->kashflow_id = $response->AddOrUpdateSubProductResult;
             if($response->Status == "NO") SugarApplication::appendErrorMessage($app_strings['LBL_FAILED_KASHFLOW_PRODUCTS']);
         }

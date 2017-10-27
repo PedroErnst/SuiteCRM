@@ -128,8 +128,8 @@ class Kashflow_Invoices {
                     "AmountPaid"    => !empty($bean->amount_paid) ? $bean->amount_paid : "0.0000",
                     "UseCustomDeliveryAddress"  => false,
                 );
-                if(!empty($bean->due_date)) $response = $kashflow->insertInvoice($parameters);
-                else SugarApplication::appendErrorMessage($app_strings['LBL_FAILED_KASHFLOW_INVOICES']);
+                if(!empty($bean->due_date) && !empty($bean->invoice_date) && !empty($accountBean->kashflow_id)) $response = $kashflow->insertInvoice($parameters);
+                else SugarApplication::appendErrorMessage($app_strings['LBL_FAILED_KASHFLOW_INVOICES_FIELDS']);
                 if(!empty($response->InsertInvoiceResult)){
                     $sql = "UPDATE aos_invoices SET number = '".$response->InsertInvoiceResult."' WHERE id = '".$bean->id."'";
                     $bean->db->query($sql);
