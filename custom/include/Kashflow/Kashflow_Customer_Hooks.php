@@ -32,7 +32,7 @@ class Kashflow_Customer_Hooks {
 
         global $app_strings;
         if(!empty($account->kashflow_id)) {
-            $customerCode['CustomerCode'] = $account->kashflow_id;
+            $customerCode['CustomerID'] = $account->kashflow_id;
             $customer = $kashflow->getCustomerByID($customerCode);
             $parameters['custr'] = $customer->GetCustomerByIDResult;
         }
@@ -60,11 +60,10 @@ class Kashflow_Customer_Hooks {
             $parameters = $this->addDefaultEntries($parameters, $account);
             $response = $kashflow->insertCustomer($parameters);
             if(!empty($response->InsertCustomerResult)) $account->kashflow_id = $response->InsertCustomerResult;
-            if($response->Status == "NO") SugarApplication::appendErrorMessage($app_strings['LBL_FAILED_KASHFLOW_CUSTOMER']);
         } else {
             $response = $kashflow->updateCustomer($parameters);
-            if($response->Status == "NO") SugarApplication::appendErrorMessage($app_strings['LBL_FAILED_KASHFLOW_CUSTOMER']);
         }
+        if($response->Status == "NO") SugarApplication::appendErrorMessage($app_strings['LBL_FAILED_KASHFLOW_CUSTOMER']);
     }
 
     function addDefaultEntries($parameters, $bean) {

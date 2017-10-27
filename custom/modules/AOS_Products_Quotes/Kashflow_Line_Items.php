@@ -13,7 +13,7 @@ class Kashflow_Line_Items{
     function addOrUpdateInvoiceLine($bean, $event, $arguments)
     {
         global $sugar_config;
-        if ($sugar_config['kashflow_api']['send_invoices'] == 1 && $bean->from_kashflow == false &&
+        if ($sugar_config['kashflow_api']['send_invoices'] == 1 && $bean->from_kashflow == false && $bean->parent_type == "AOS_Invoices" &&
             (($sugar_config['kashflow_api']['send_invoices_option'] == 'modified' && $bean->date_entered != $bean->date_modified) ||
              ($sugar_config['kashflow_api']['send_invoices_option'] == 'new' && $bean->date_entered == $bean->date_modified) ||
               $sugar_config['kashflow_api']['send_invoices_option'] == 'all' && $bean->deleted == 0)) {
