@@ -29,3 +29,4 @@ if (!isset($hook_array['before_save']) || !is_array($hook_array['before_save']))
     $hook_array['before_save'] = array();
 }
 $hook_array['before_save'][] = Array(19, 'Add or Update Customers', 'custom/include/Kashflow/Kashflow_Customer_Hooks.php','Kashflow_Customer_Hooks', 'addOrUpdateCustomer');
+$hook_array['before_save'][] = Array(18, 'Check for other Billing Contacts', 'custom/include/Kashflow/Kashflow_Customer_Hooks.php','Kashflow_Customer_Hooks', 'checkExistingBillingContact');

@@ -28,6 +28,22 @@ class Kashflow_Customer_Hooks {
         }
     }
 
+    function checkExistingBillingContact($bean, $event, $arguments)
+    {
+        global $app_strings;
+        if ($bean->billing_contact == true && !empty($bean->account_id)) {
+            $accountBean = BeanFactory::getBean("Accounts", $bean->account_id);
+            $accountBean->load_relationship("contacts");
+            $accountBean->contacts->getBeans();
+            foreach($accountBean->contacts->beans as $contact) {
+                if ($contact->id != $bean->id && $contact->billing_contact == true) {
+                    $contact->billing_contact = false;
+                    $contact->save();
+                }
+            }
+        }
+    }
+
     function sendCustomerDetails($account, $kashflow, $contact = "") {
 
         global $app_strings;

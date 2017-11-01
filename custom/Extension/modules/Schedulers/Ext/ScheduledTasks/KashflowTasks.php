@@ -1,5 +1,6 @@
 <?php
 
+$job_strings[] = 'getCustomers';
 $job_strings[] = 'getProducts';
 $job_strings[] = 'getInvoices';
 
@@ -8,6 +9,26 @@ require_once 'modules/AOS_Products/AOS_Products.php';
 require_once 'modules/AOS_Products_Quotes/AOS_Products_Quotes.php';
 require_once 'modules/AOS_Invoices/AOS_Invoices.php';
 require_once 'modules/Accounts/Account.php';
+
+function getCustomers() {
+    $kashflow = new Kashflow();
+    $response = $kashflow->getCustomers();
+    if ($response->Status == "OK") {
+        $customersArray = "";
+        if(!empty($response->GetCustomersResult->Customer->CustomerID))
+            $customersArray [] = $response->GetCustomersResult->Customer;
+        else
+            $customersArray  = $response->GetCustomersResult->Customer;
+        foreach($customersArray as $customer) {
+            if(!empty($customer->CustomerID)) {
+                // Find based on Kashflow ID
+                $accountBean = new Account();
+                $accountBean->retrieve_by_string_fields(array('kashflow_id' => $customer->CustomerID));
+                updateAccount($accountBean, $customer);
+            }
+        }
+    }
+}
 
 function getProducts() {
     global $app_list_strings;
@@ -54,6 +75,42 @@ function getInvoices() {
             } else updateInvoice($invoiceBean, $invoice);
             updateLineItems($invoiceBean, $invoice);
         }
+    }
+}
+
+function updateAccount($accountBean, $customer) {
+
+    $accountBean->kashflow_id = $customer->CustomerID;
+    $accountBean->kashflow_code = $customer->Code;
+    $accountBean->name = $customer->Name;
+    $accountBean->phone_office = $customer->Telephone;
+    $accountBean->fax = $customer->Fax;
+    $accountBean->email = $customer->Email;
+    $accountBean->billing_address_street = $customer->Address1;
+    $accountBean->billing_address_city = $customer->Address2;
+    $accountBean->billing_address_state = $customer->Address3;
+    $accountBean->billing_address_country = $customer->Address4;
+    $accountBean->billing_address_postcode = $customer->Postcode;
+    $accountBean->website = $customer->Website;
+    $accountBean->from_kashflow = true;
+    $accountBean->save();
+
+    // Now handle Billing Contact
+    $accountBean->load_relationship("contacts");
+    $contactBean = new Contact();
+    $accountBean->contacts->getBeans();
+    foreach($accountBean->contacts->beans as $contact) {
+        if ($contact->billing_contact == true) $contactBean = $contact;
+    }
+    if(!empty($customer->ContactFirstName) && !empty($customer->ContactLastName)) {
+        $contactBean->salutation = $customer->ContactTitle;
+        $contactBean->first_name = $customer->ContactFirstName;
+        $contactBean->last_name = $customer->ContactLastName;
+        $contactBean->phone_mobile = $customer->Mobile;
+        $contactBean->billing_contact = true;
+        $contactBean->account_id = $accountBean->id;
+        $contactBean->from_kashflow = true;
+        $contactBean->save();
     }
 }
 
