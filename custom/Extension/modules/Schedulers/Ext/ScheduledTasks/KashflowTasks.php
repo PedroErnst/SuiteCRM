@@ -16,7 +16,7 @@ function getCustomers() {
     if ($response->Status == "OK") {
         $customersArray = "";
         if(!empty($response->GetCustomersResult->Customer->CustomerID))
-            $customersArray [] = $response->GetCustomersResult->Customer;
+            $customersArray[] = $response->GetCustomersResult->Customer;
         else
             $customersArray  = $response->GetCustomersResult->Customer;
         foreach($customersArray as $customer) {
