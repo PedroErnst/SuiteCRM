@@ -108,7 +108,7 @@ class Kashflow_Invoices {
                             "ValuesInCurrency" => 0,
                             "ProjID"           => 0,
                         );
-                        $lines[] = new SoapVar($line, 0, "InvoiceLine", "KashFlow");
+                        $lines[] = new SoapVar($line, XSD_STRING, "InvoiceLine", "KashFlow");
                     }
                 }
                 $parameters['Inv'] = array

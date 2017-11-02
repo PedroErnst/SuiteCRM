@@ -18,7 +18,7 @@ function getCustomers() {
         if(!empty($response->GetCustomersResult->Customer->CustomerID))
             $customersArray[] = $response->GetCustomersResult->Customer;
         else
-            $customersArray  = $response->GetCustomersResult->Customer;
+            $customersArray = $response->GetCustomersResult->Customer;
         foreach($customersArray as $customer) {
             if(!empty($customer->CustomerID)) {
                 // Find based on Kashflow ID
