@@ -14,7 +14,7 @@ function getCustomers() {
     $kashflow = new Kashflow();
     $response = $kashflow->getCustomers();
     if ($response->Status == "OK") {
-        $customersArray = "";
+        $customersArray = array();
         if(!empty($response->GetCustomersResult->Customer->CustomerID))
             $customersArray[] = $response->GetCustomersResult->Customer;
         else
@@ -37,7 +37,7 @@ function getProducts() {
     foreach($app_list_strings['kashflow_nominal_codes'] as $code => $label) {
         $response = $kashflow->getSubProducts($code);
         if ($response->Status == "OK") {
-            $productsArray = "";
+            $productsArray = array();
             if(!empty($response->GetSubProductsResult->SubProduct->id))
                 $productsArray[] = $response->GetSubProductsResult->SubProduct;
             else
@@ -61,7 +61,7 @@ function getInvoices() {
     $kashflow = new Kashflow();
     $response = $kashflow->getInvoicesByDateRange();
     if ($response->Status == "OK") {
-        $invoiceArray = "";
+        $invoiceArray = array();
         if(!empty($response->GetInvoicesByDateRangeResult->Invoice->InvoiceDBID))
             $invoiceArray[] = $response->GetInvoicesByDateRangeResult->Invoice;
         else
