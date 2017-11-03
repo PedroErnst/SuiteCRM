@@ -60,6 +60,7 @@ class Kashflow_Customer_Hooks {
             $parameters['custr']->ContactTitle = !empty($contact->salutation) ? $contact->salutation : "";
             $parameters['custr']->ContactFirstName = !empty($contact->first_name) ? $contact->first_name : "";
             $parameters['custr']->ContactLastName = !empty($contact->last_name) ? $contact->last_name : "";
+            $parameters['custr']->Contact = $contact->salutation . " " . $contact->first_name . " " . $contact->last_name;
             $parameters['custr']->Mobile = !empty($contact->phone_mobile) ? $contact->phone_mobile : "";
         }
         $parameters['custr']->Telephone = !empty($account->phone_office) ? $account->phone_office : "";
