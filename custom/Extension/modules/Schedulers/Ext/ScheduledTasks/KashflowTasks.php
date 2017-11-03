@@ -84,13 +84,13 @@ function updateAccount($accountBean, $customer) {
     $accountBean->kashflow_code = $customer->Code;
     $accountBean->name = $customer->Name;
     $accountBean->phone_office = $customer->Telephone;
-    $accountBean->fax = $customer->Fax;
-    $accountBean->email = $customer->Email;
+    $accountBean->phone_fax = $customer->Fax;
+    $accountBean->email1 = $customer->Email;
     $accountBean->billing_address_street = $customer->Address1;
     $accountBean->billing_address_city = $customer->Address2;
     $accountBean->billing_address_state = $customer->Address3;
     $accountBean->billing_address_country = $customer->Address4;
-    $accountBean->billing_address_postcode = $customer->Postcode;
+    $accountBean->billing_address_postalcode = $customer->Postcode;
     $accountBean->website = $customer->Website;
     $accountBean->from_kashflow = true;
     $accountBean->save();

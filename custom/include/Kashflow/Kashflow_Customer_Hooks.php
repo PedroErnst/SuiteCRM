@@ -63,13 +63,13 @@ class Kashflow_Customer_Hooks {
             $parameters['custr']->Mobile = !empty($contact->phone_mobile) ? $contact->phone_mobile : "";
         }
         $parameters['custr']->Telephone = !empty($account->phone_office) ? $account->phone_office : "";
-        $parameters['custr']->Fax = !empty($account->fax) ? $account->fax : "";
-        $parameters['custr']->Email = $account->email;
+        $parameters['custr']->Fax = !empty($account->phone_fax) ? $account->phone_fax : "";
+        $parameters['custr']->Email = $account->email1;
         $parameters['custr']->Address1 = $account->billing_address_street;
         $parameters['custr']->Address2 = $account->billing_address_city;
         $parameters['custr']->Address3 = $account->billing_address_state;
         $parameters['custr']->Address4 = $account->billing_address_country;
-        $parameters['custr']->Postcode = !empty($account->billing_address_postcode) ? $account->billing_address_postcode : "";
+        $parameters['custr']->Postcode = !empty($account->billing_address_postalcode) ? $account->billing_address_postalcode : "";
         $parameters['custr']->Website = $account->website;
 
         if(empty($account->kashflow_id)) {
