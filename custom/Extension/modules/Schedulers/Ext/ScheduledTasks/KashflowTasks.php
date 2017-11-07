@@ -69,8 +69,9 @@ function getInvoices() {
         foreach($invoiceArray as $invoice) {
             // Find based on Kashflow ID
             $invoiceBean = new AOS_Invoices();
-            $invoiceBean->retrieve_by_string_fields(array('number' => $invoice->InvoiceNumber));
+            $invoiceBean->retrieve_by_string_fields(array('number' => $invoice->InvoiceNumber, 'kashflow_id' => $invoice->InvoiceDBID));
             if(empty($invoiceBean->id)) $invoiceBean->retrieve_by_string_fields(array('kashflow_id' => $invoice->InvoiceDBID));
+            if(empty($invoiceBean->id)) $invoiceBean->retrieve_by_string_fields(array('number' => $invoice->InvoiceNumber));
             if(!empty($invoiceBean->id)) {
                 if (checkIfChangedInvoice($invoiceBean, $invoice) == true) updateInvoice($invoiceBean, $invoice);
             } else updateInvoice($invoiceBean, $invoice);
