@@ -1,0 +1,27 @@
+<?php
+
+$finder = PhpCsFixer\Finder::create()
+    ->exclude('cache')
+    ->exclude('include/HTMLPurifier')
+    ->exclude('include/pclzip')
+    ->exclude('include/Pear')
+    ->exclude('include/phpmailer')
+    ->exclude('include/reCaptcha')
+    ->exclude('include/Smarty')
+    ->exclude('include/tcpdf')
+    ->exclude('include/ytree')
+    ->exclude('public')
+    ->exclude('themes')
+    ->exclude('upload')
+    ->exclude('vendor')
+    ->exclude('Zend')
+    ->in(__DIR__)
+;
+
+return PhpCsFixer\Config::create()
+    ->setRules([
+        '@PSR2' => true,
+    ])
+    ->setFinder($finder)
+;
+
