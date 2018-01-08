@@ -513,15 +513,7 @@
       var formData = new FormData(jQueryFormComposeView);
 
       $(this).find('input').each(function (inputIndex, inputValue) {
-        if ($(inputValue).attr('type').toLowerCase() === 'file') {
-          for (var fileIndex = 0; fileIndex < inputValue.files.length; fileIndex++) {
-            var file = inputValue.files[fileIndex];
-            var reader = new FileReader();
-            reader.readAsDataURL(file);
-            formData.append($(inputValue).attr('name'), file);
-            fileCount++;
-          }
-        } else {
+        if ($(inputValue).attr('type').toLowerCase() !== 'file') {
           if ($(inputValue).attr('name') === 'action') {
             formData.append('refer_' + $(inputValue).attr('name'), $(inputValue).val());
             formData.append($(inputValue).attr('name'), 'send');
