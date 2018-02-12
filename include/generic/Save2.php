@@ -165,8 +165,11 @@ else {
 	            $where_clauses = '('. implode(' ) AND ( ', $where_clauses_arr) . ')';
 	        }
         }
-        
-        $query = $seed->create_new_list_query($order_by, $where_clauses);
+        $fields = !empty($current_query_by_page_array['filter_fields'])
+            ? explode($current_query_by_page_array['filter_fields']) : [];
+        $query_array = $seed->create_new_list_query($order_by, $where_clauses, $fields, array(), 0, '', true);
+
+        $query = $query_array['select'] . $query_array['secondary_from'] . $query_array['where'] . $query_array['order_by'];
 		$result = $GLOBALS['db']->query($query,true);
 		$uids = array();
 		while($val = $GLOBALS['db']->fetchByAssoc($result,false))

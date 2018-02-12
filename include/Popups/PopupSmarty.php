@@ -189,6 +189,8 @@ class PopupSmarty extends ListViewSmarty{
 		$this->th->ss->assign('bgColor', array($odd_bg, $even_bg));
         $this->th->ss->assign('contextMenus', $this->contextMenus);
 
+        $fields = isset($this->filter_fields) ? implode(',', array_keys($this->filter_fields)) : '';
+        $this->th->ss->assign('filter_fields', $fields);
 
         if($this->contextMenus && !empty($contextMenuObjectsTypes)) {
             $script = '';

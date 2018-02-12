@@ -75,6 +75,7 @@ function clearAll() {
 <input type="hidden" name="populate_parent" value="false" />
 <input type="hidden" name="hide_clear_button" value="true" />
 <input type="hidden" name="record_id" value="" />
+<input type="hidden" name="filter_fields" value="{$filter_fields}" />
 {$MODE}
 <input type="submit" name="button" class="button" id="search_form_submit"
 	title="{$APP.LBL_SEARCH_BUTTON_TITLE}"
