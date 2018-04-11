@@ -105,10 +105,10 @@ class Kashflow
     /**
      * @return mixed
      */
-    public function getInvoicesByDateRange()
+    public function getInvoicesByDateRange($startDate, $endDate)
     {
-        $parameters['StartDate'] = "2000-01-01T00:00:00";
-        $parameters['EndDate'] = date('Y-m-d')."T00:00:00";
+        $parameters['StartDate'] = $startDate;
+        $parameters['EndDate'] = $endDate;
         return $this->makeRequest("GetInvoicesByDateRange", $parameters);
     }
 

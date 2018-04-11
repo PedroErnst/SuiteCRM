@@ -27,16 +27,11 @@
                 <input type='password' size='50' class="kashflow_api" name='kashflow_api[password]' value='{$config.kashflow_api.password}'>
             </td>
         </tr>
-
-        <tr>
-            <td scope="row" width="200">
-                <button class="button primary" id='kashflowTestConnection' name='kashflowTestConnection'>{$MOD.LBL_KASHFLOW_TEST_CONNECTION}</button>
-            </td>
-            <td scope="row" width="200">
-                <button class="button primary" id='kashflowGetNominalCodes' name='kashflowGetNominalCodes'>{$MOD.LBL_KASHFLOW_GET_NOMINAL_CODES}</button>
-            </td>
-        </tr>
     </table>
+
+    <button class="button primary" id='kashflowTestConnection' name='kashflowTestConnection'>{$MOD.LBL_KASHFLOW_TEST_CONNECTION}</button>&nbsp;
+    <button class="button primary" id='kashflowGetNominalCodes' name='kashflowGetNominalCodes'>{$MOD.LBL_KASHFLOW_GET_NOMINAL_CODES}</button>&nbsp;
+    <button class="button primary" id='kashflowGetAllInvoices' name='kashflowGetAllInvoices'>{$MOD.LBL_KASHFLOW_GET_ALL_INVOICES}</button>&nbsp;
 
     <table width="100%" border="0" cellspacing="1" cellpadding="0" class="edit view">
         <tr>
@@ -100,6 +95,13 @@
                 <input type="checkbox" class="kashflow_api" id="kashflow_api[get_invoices]" name="kashflow_api[get_invoices]" value="1" {$checked} >
                 <span> {$MOD.LBL_KASHFLOW_GET_INVOICES}</span>
             </td>
+            <td scope="row" width="2">
+                <select class="kashflow_api" id="kashflow_api[invoice_range]" name="kashflow_api[invoice_range]">
+                    <option label="Last Day" value="day" {if $config.kashflow_api.invoice_range == "day"}selected="selected"{/if}>Last Day</option>
+                    <option label="Last Week" value="week" {if $config.kashflow_api.invoice_range == "week"}selected="selected"{/if}>Last Week</option>
+                    <option label="Last Month" value="month" {if $config.kashflow_api.invoice_range == "month"}selected="selected"{/if}>Last Month</option>
+                </select>
+            </td>
         </tr>
         <tr>
             <td scope="row" width="2">
@@ -151,6 +153,24 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" id="kashflowGetNominalCodesClose" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="kashflowGetAllInvoicesModal" class="modal bs-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel">
+        <div class="modal-dialog modal-sm" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">&nbsp;</h4>
+                </div>
+                <div style="height:85px;" class="modal-body">
+                    <p style='text-align:center;' class="message">{$MOD.LBL_KASHFLOW_GET_ALL_INVOICES_LOADING}</p>
+                    <p style='text-align:center;' class="loadingGif">{$LOADING_GIF}</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="kashflowGetAllInvoicesClose" class="btn btn-default" data-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>

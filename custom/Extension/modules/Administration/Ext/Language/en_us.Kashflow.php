@@ -23,3 +23,8 @@ $mod_strings['LBL_KASHFLOW_GET_NOMINAL_CODES'] = 'Get Nominal Codes';
 $mod_strings['LBL_KASHFLOW_GET_NOMINAL_CODES_SUCCESS'] = 'Successfully retrieved Nominal Codes';
 $mod_strings['LBL_KASHFLOW_GET_NOMINAL_CODES_FAILURE'] = 'Failed to retrieve Nominal Codes';
 $mod_strings['LBL_KASHFLOW_GET_NOMINAL_CODES_LOADING'] = 'Retrieving Nominal Codes';
+
+$mod_strings['LBL_KASHFLOW_GET_ALL_INVOICES'] = 'Get All Invoices';
+$mod_strings['LBL_KASHFLOW_GET_ALL_INVOICES_SUCCESS'] = 'Successfully retrieved Invoices';
+$mod_strings['LBL_KASHFLOW_GET_ALL_INVOICES_FAILURE'] = 'Failed to retrieve Invoices';
+$mod_strings['LBL_KASHFLOW_GET_ALL_INVOICES_LOADING'] = 'Retrieving all invoices. This will take a few minutes.';

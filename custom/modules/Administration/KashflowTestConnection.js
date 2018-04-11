@@ -66,6 +66,39 @@ $(document).ready(function(){
       $('.loadingGif').hide();
     });
   };
+
+  $('#kashflowGetAllInvoices').on('click', function(e){
+    $('#kashflowGetAllInvoicesModal').modal('show');
+    e.preventDefault();
+    getAllInvoices($('input[name^="kashflow_api"]').serializeArray());
+  });
+
+  // Reset message when cancel is clicked.
+  $('#kashflowGetAllInvoicesClose').on('click', function(e){
+    e.preventDefault();
+    resetMessageInvoices();
+  });
+
+  function resetMessageInvoices() {
+    $('#kashflowGetAllInvoicesModal').modal('hide');
+    $('.message').html(SUGAR.language.translate('Administration', 'LBL_KASHFLOW_GET_ALL_INVOICES_LOADING'));
+    $('.loadingGif').show();
+  }
+
+  var getAllInvoices = function(data) {
+    $.ajax({
+      method: "POST",
+      url: 'index.php?module=Administration&action=KashflowGetAllInvoices&to_pdf=true',
+      data: data
+    }) .always(function(result) {
+      if (result) {
+        $('.message').html(SUGAR.language.translate('Administration', 'LBL_KASHFLOW_GET_ALL_INVOICES_SUCCESS'));
+      } else {
+        $('.message').html(SUGAR.language.translate('Administration', 'LBL_KASHFLOW_GET_ALL_INVOICES_FAILURE'));
+      }
+      $('.loadingGif').hide();
+    });
+  };
 });
 
 

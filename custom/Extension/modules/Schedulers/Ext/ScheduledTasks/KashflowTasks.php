@@ -71,7 +71,7 @@ function getProducts() {
                     $productBean->retrieve_by_string_fields(array('kashflow_id' => $product->id));
                     if(!empty($productBean->id)) {
                         if (checkIfChangedProduct($productBean, $product) == true) updateProduct($productBean, $product);
-                    } else updateProduct($productBean, $product);
+                    } else createProduct($productBean, $product);
                 }
             }
             // return true;
@@ -104,15 +104,15 @@ function getInvoicesFromLastMonth() {
  * @param string $interval
  * @param int $maxNewRecords
  */
-function getInvoicesFromInterval($interval, $maxNewRecords = 50) {
+function getInvoices($interval, $maxNewRecords = 50) {
 
-    global $timedate;
+    global $timedate, $sugar_config;
 
     // Set script timeout to 10 hours
     ini_set("max_execution_time", "3600");
 
     $end = $timedate->getNow();
-    $interval1 = DateInterval::createFromDateString($interval);
+    $interval1 = $sugar_config['kashflow_api']['invoice_range'];
     $start = $timedate->getNow()->sub($interval1);
 
     $kashflow = new Kashflow();
@@ -307,7 +307,7 @@ function createAccount($customer) {
  * @param $productBean
  * @param $product
  */
-function updateProduct($productBean, $product) {
+function createProduct($productBean, $product) {
 
     $productBean->kashflow_id = $product->id;
     $productBean->nominal_code = $product->ParentID;
@@ -323,6 +323,29 @@ function updateProduct($productBean, $product) {
     $productBean->autofill = $product->AutoFill;
     $productBean->from_kashflow = true;
     $productBean->save();
+}
+
+/**
+ * @param $productBean
+ * @param $product
+ */
+function updateProduct($productBean, $product) {
+
+    global $db;
+    $sql = "UPDATE aos_products " .
+           "SET nominal_code = '" . $product->ParentID . "', " .
+           "name = '" . $product->Name . "', " .
+           "part_number = '" . substr($product->Code, 0, 10) . "', " .
+           "description = '" . substr($product->Description, 0, 10) . "', " .
+           "price = '" . ($product->Price === 1 ? "Paid" : "Unpaid") . "', " .
+           "vat_rate = '" . $product->VatRate . "', " .
+           "cost = '" . $product->WholesalePrice . "', " .
+           "managed = '" . $product->Managed . "' " .
+           "qty_in_stock = '" . $product->QtyInStock . "' " .
+           "stock_warn_qty = '" . $product->StockWarnQty . "' " .
+           "autofill = '" . $product->AutoFill . "' " .
+           "WHERE kashflow_id = '" . $product->id . "'";
+    $db->query($sql);
 }
 
 /**
