@@ -21,6 +21,11 @@ class Kashflow_Invoices {
                 $kashflowAccount = new Kashflow_Customer_Hooks();
                 if(!empty($bean->billing_contact_id)) {
                     $contactBean = BeanFactory::getBean("Contacts", $bean->billing_contact_id);
+                    if($contactBean->account_id != $accountBean->id) {
+                        $contactBean->account_id = $accountBean->id;
+                        $contactBean->billing_contact = true;
+                        $contactBean->save();
+                    }
                     $kashflowAccount->sendCustomerDetails($accountBean, $kashflow, $contactBean);
                 } else {
                     if($accountBean->load_relationship('contacts')) {

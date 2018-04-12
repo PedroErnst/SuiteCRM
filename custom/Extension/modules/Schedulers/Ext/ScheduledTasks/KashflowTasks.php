@@ -112,7 +112,7 @@ function getInvoices($interval, $maxNewRecords = 50) {
     ini_set("max_execution_time", "3600");
 
     $end = $timedate->getNow();
-    $interval1 = $sugar_config['kashflow_api']['invoice_range'];
+    $interval1 = DateInterval::createFromDateString($sugar_config['kashflow_api']['invoice_range']);
     $start = $timedate->getNow()->sub($interval1);
 
     $kashflow = new Kashflow();

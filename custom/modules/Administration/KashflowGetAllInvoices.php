@@ -58,3 +58,41 @@ function saveInvoiceResponse($response, $maxNewRecords = 50) {
     }
     return true;
 }
+
+/**
+ * @param array $recordArray
+ * @param string $table
+ * @param array $fieldsToCheck
+ * @param string $subFieldName
+ * @return array
+ */
+function checkIfKashFlowRecordsExists($recordArray, $table, $fieldsToCheck, $subFieldName = null)
+{
+    global $db;
+    $existing = [];
+    $arrayFieldsToCheck = [];
+    foreach ($fieldsToCheck as $recordName => $dbName) {
+        $arrayFieldsToCheck[$dbName] = [];
+    }
+    foreach ($recordArray as $record) {
+        foreach ($fieldsToCheck as $recordName => $dbName) {
+            if ($subFieldName) {
+                $arrayFieldsToCheck[$dbName][] = $record->$subFieldName->$recordName;
+                continue;
+            }
+            $arrayFieldsToCheck[$dbName][] = $record->$recordName;
+        }
+    }
+    $sql = "SELECT id," . implode(',', $fieldsToCheck) . " FROM $table WHERE ";
+    foreach ($arrayFieldsToCheck as $fieldName => $values) {
+        $sql .= "OR $fieldName IN (" . implode(',', $values) . ") ";
+    }
+    $sql = str_replace('WHERE OR', 'WHERE', $sql);
+    $result = $db->query($sql);
+    $fieldToReturn = array_shift($fieldsToCheck);
+    while ($row = $db->fetchByAssoc($result)) {
+        $existing[$row['id']] = $row[$fieldToReturn];
+    }
+
+    return $existing;
+}
