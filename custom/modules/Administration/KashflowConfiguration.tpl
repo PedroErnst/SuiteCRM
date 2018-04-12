@@ -97,9 +97,9 @@
             </td>
             <td scope="row" width="2">
                 <select class="kashflow_api" id="kashflow_api[invoice_range]" name="kashflow_api[invoice_range]">
-                    <option label="Last Day" value="day" {if $config.kashflow_api.invoice_range == "day"}selected="selected"{/if}>Last Day</option>
-                    <option label="Last Week" value="week" {if $config.kashflow_api.invoice_range == "week"}selected="selected"{/if}>Last Week</option>
-                    <option label="Last Month" value="month" {if $config.kashflow_api.invoice_range == "month"}selected="selected"{/if}>Last Month</option>
+                    <option label="Last Day" value="1 day" {if $config.kashflow_api.invoice_range == "day"}selected="selected"{/if}>Last Day</option>
+                    <option label="Last Week" value="1 week" {if $config.kashflow_api.invoice_range == "week"}selected="selected"{/if}>Last Week</option>
+                    <option label="Last Month" value="1 month" {if $config.kashflow_api.invoice_range == "month"}selected="selected"{/if}>Last Month</option>
                 </select>
             </td>
         </tr>
