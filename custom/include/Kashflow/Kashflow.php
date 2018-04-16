@@ -145,7 +145,7 @@ class Kashflow
      */
     public function getSubProducts($code)
     {
-        $parameters = "";
+        $parameters = [];
         $parameters['NominalID'] = $code;
         return $this->makeRequest("GetSubProducts", $parameters);
     }
