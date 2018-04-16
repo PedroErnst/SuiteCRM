@@ -1,5 +1,7 @@
 <?php
 
+
+$job_strings[] = 'kashFlowSync';
 $job_strings[] = 'getCustomers';
 $job_strings[] = 'getProducts';
 $job_strings[] = 'getInvoices';
@@ -9,6 +11,16 @@ require_once 'modules/AOS_Products/AOS_Products.php';
 require_once 'modules/AOS_Products_Quotes/AOS_Products_Quotes.php';
 require_once 'modules/AOS_Invoices/AOS_Invoices.php';
 require_once 'modules/Accounts/Account.php';
+
+/**
+ * Run all three kashflow tasks
+ */
+function kashFlowSync()
+{
+    getProducts();
+    getCustomers();
+    getInvoices();
+}
 
 /**
  * @return bool
@@ -104,7 +116,7 @@ function getInvoicesFromLastMonth() {
  * @param string $interval
  * @param int $maxNewRecords
  */
-function getInvoices($interval, $maxNewRecords = 50) {
+function getInvoices($interval = '1 day', $maxNewRecords = 50) {
 
     global $timedate, $sugar_config;
 
