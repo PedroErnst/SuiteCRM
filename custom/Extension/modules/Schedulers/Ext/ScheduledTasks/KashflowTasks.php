@@ -254,7 +254,9 @@ function updateAccount($parentId, $customer) {
             "first_name = '" . $customer->ContactFirstName . "', " .
             "last_name = '" . $customer->ContactLastName . "', " .
             "phone_mobile = '" . $customer->Mobile . "' " .
-            "WHERE billing_contact = 1 AND account_id = '" . $parentId . "'";
+            "WHERE billing_contact = 1 " .
+            "AND id IN (SELECT contact_id FROM accounts_contacts WHERE account_id = " .
+            "'" . $parentId . "') LIMIT 1";
         $db->query($sql);
     }
 }
