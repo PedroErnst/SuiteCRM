@@ -45,9 +45,9 @@ chdir(dirname(__FILE__));
 require_once('include/entryPoint.php');
 
 $sapi_type = php_sapi_name();
-if (substr($sapi_type, 0, 3) != 'cli') {
-    sugar_die("cron.php is CLI only.");
-}
+//if (substr($sapi_type, 0, 3) != 'cli') {
+//    sugar_die("cron.php is CLI only.");
+//}
 
 if (!is_windows()) {
     require_once 'include/utils.php';

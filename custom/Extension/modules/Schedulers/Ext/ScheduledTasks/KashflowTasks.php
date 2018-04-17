@@ -93,39 +93,21 @@ function getProducts() {
 }
 
 /**
- *
- */
-function getInvoicesFromLast24Hours() {
-    getInvoicesFromInterval('1 day', 10);
-}
-
-/**
- *
- */
-function getInvoicesFromLastWeek() {
-    getInvoicesFromInterval('1 week', 20);
-}
-
-/**
- *
- */
-function getInvoicesFromLastMonth() {
-    getInvoicesFromInterval('1 month', 50);
-}
-
-/**
  * @param string $interval
  * @param int $maxNewRecords
  */
-function getInvoices($interval = '1 day', $maxNewRecords = 50) {
+function getInvoices($interval = false, $maxNewRecords = 500) {
 
     global $timedate, $sugar_config;
 
+    if (!$interval) {
+        $interval = $sugar_config['kashflow_api']['invoice_range'];
+    }
     // Set script timeout to 10 hours
     ini_set("max_execution_time", "3600");
 
     $end = $timedate->getNow();
-    $interval1 = DateInterval::createFromDateString($sugar_config['kashflow_api']['invoice_range']);
+    $interval1 = DateInterval::createFromDateString($interval);
     $start = $timedate->getNow()->sub($interval1);
 
     $kashflow = new Kashflow();
