@@ -155,7 +155,7 @@ function saveInvoiceResponse($response, $maxNewRecords = 50) {
     $invoiceArray = [];
     if (!empty($response->GetInvoicesByDateRangeResult->Invoice->InvoiceDBID)) {
         $invoiceArray[] = $response->GetInvoicesByDateRangeResult->Invoice;
-    } else {
+    } elseif (is_array($response->GetInvoicesByDateRangeResult->Invoice)) {
         $invoiceArray = $response->GetInvoicesByDateRangeResult->Invoice;
     }
 
@@ -193,6 +193,9 @@ function checkIfKashFlowRecordsExists($recordArray, $table, $fieldsToCheck, $sub
 {
     global $db;
     $existing = [];
+    if (!count($recordArray)) {
+        return $existing;
+    }
     $arrayFieldsToCheck = [];
     foreach ($fieldsToCheck as $recordName => $dbName) {
         $arrayFieldsToCheck[$dbName] = [];
