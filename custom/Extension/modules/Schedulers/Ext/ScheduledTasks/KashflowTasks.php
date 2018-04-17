@@ -72,10 +72,11 @@ function getProducts() {
         $response = $kashflow->getSubProducts($code);
         if ($response->Status == "OK") {
             $productsArray = array();
-            if(!empty($response->GetSubProductsResult->SubProduct->id))
+            if (!empty($response->GetSubProductsResult->SubProduct->id)) {
                 $productsArray[] = $response->GetSubProductsResult->SubProduct;
-            else
+            } elseif (is_array($response->GetSubProductsResult->SubProduct)) {
                 $productsArray = $response->GetSubProductsResult->SubProduct;
+            }
             foreach($productsArray as $product) {
                 if(!empty($product->id)) {
                     // Find based on Kashflow ID
@@ -227,7 +228,8 @@ function checkIfKashFlowRecordsExists($recordArray, $table, $fieldsToCheck, $sub
     foreach ($arrayFieldsToCheck as $fieldName => $values) {
         $sql .= "OR $fieldName IN (" . implode(',', $values) . ") ";
     }
-    $sql = str_replace('WHERE OR', 'WHERE', $sql);
+    $sql = str_replace('WHERE OR', 'WHERE (', $sql);
+    $sql .= ') AND deleted = 0';
     $result = $db->query($sql);
     $fieldToReturn = array_shift($fieldsToCheck);
     while ($row = $db->fetchByAssoc($result)) {
