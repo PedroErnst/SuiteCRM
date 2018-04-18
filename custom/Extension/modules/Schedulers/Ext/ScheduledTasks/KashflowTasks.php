@@ -119,9 +119,9 @@ function getInvoices($interval = false, $maxNewRecords = 500) {
 }
 
 /**
- *
+ * @param string $startDate
  */
-function getAllInvoices() {
+function getAllInvoices($startDate = '2000-01-01') {
 
     global $timedate;
 
@@ -129,7 +129,7 @@ function getAllInvoices() {
     ini_set("max_execution_time", "36000");
 
     $interval = DateInterval::createFromDateString('1 month');
-    $start = $timedate->fromDbDate('2000-01-01');
+    $start = $timedate->fromDbDate($startDate);
     $end = $timedate->getNow();
 
     $kashflow = new Kashflow();
