@@ -234,15 +234,15 @@ function updateAccount($parentId, $customer) {
 
     $sql = "UPDATE accounts " .
         "SET kashflow_code = '" . $customer->Code . "', " .
-        "name = '" . $customer->Name . "', " .
-        "phone_office = '" . $customer->Telephone . "', " .
-        "phone_fax = '" . $customer->Fax . "', " .
-        "billing_address_street = '" . $customer->Address1 . "', " .
-        "billing_address_city = '" . $customer->Address2 . "', " .
-        "billing_address_state = '" . $customer->Address3 . "', " .
-        "billing_address_country = '" . $customer->Address4 . "', " .
-        "billing_address_postalcode = '" . $customer->Postcode . "', " .
-        "website = '" . $customer->Website . "' " .
+        "name = '" . $db->quote($customer->Name) . "', " .
+        "phone_office = '" . $db->quote($customer->Telephone) . "', " .
+        "phone_fax = '" . $db->quote($customer->Fax) . "', " .
+        "billing_address_street = '" . $db->quote($customer->Address1) . "', " .
+        "billing_address_city = '" . $db->quote($customer->Address2) . "', " .
+        "billing_address_state = '" . $db->quote($customer->Address3) . "', " .
+        "billing_address_country = '" . $db->quote($customer->Address4) . "', " .
+        "billing_address_postalcode = '" . $db->quote($customer->Postcode) . "', " .
+        "website = '" . $db->quote($customer->Website) . "' " .
         "WHERE id = '" . $parentId . "'";
     $db->query($sql);
 
@@ -250,9 +250,9 @@ function updateAccount($parentId, $customer) {
     if(!empty($customer->ContactFirstName) && !empty($customer->ContactLastName)) {
         $sql = "UPDATE contacts " .
             "SET salutation = '" . $customer->ContactTitle . "', " .
-            "first_name = '" . $customer->ContactFirstName . "', " .
-            "last_name = '" . $customer->ContactLastName . "', " .
-            "phone_mobile = '" . $customer->Mobile . "' " .
+            "first_name = '" . $db->quote($customer->ContactFirstName) . "', " .
+            "last_name = '" . $db->quote($customer->ContactLastName) . "', " .
+            "phone_mobile = '" . $db->quote($customer->Mobile) . "' " .
             "WHERE billing_contact = 1 " .
             "AND id IN (SELECT contact_id FROM accounts_contacts WHERE account_id = " .
             "'" . $parentId . "') LIMIT 1";
@@ -334,10 +334,10 @@ function updateProduct($productBean, $product) {
 
     global $db;
     $sql = "UPDATE aos_products " .
-           "SET nominal_code = '" . $product->ParentID . "', " .
-           "name = '" . $product->Name . "', " .
-           "part_number = '" . substr($product->Code, 0, 10) . "', " .
-           "description = '" . substr($product->Description, 0, 10) . "', " .
+           "SET nominal_code = '" . $db->quote($product->ParentID) . "', " .
+           "name = '" . $db->quote($product->Name) . "', " .
+           "part_number = '" . $db->quote(substr($product->Code, 0, 10)) . "', " .
+           "description = '" . $db->quote(substr($product->Description, 0, 10)) . "', " .
            "price = '" . ($product->Price === 1 ? "Paid" : "Unpaid") . "', " .
            "vat_rate = '" . $product->VatRate . "', " .
            "cost = '" . $product->WholesalePrice . "', " .
@@ -378,7 +378,7 @@ function updateInvoice(stdClass $invoice) {
     global $db;
     $sql = "UPDATE aos_invoices " .
         "SET number = '" . $invoice->InvoiceNumber . "', " .
-        "name = '" . $invoice->CustomerName . "', " .
+        "name = '" . $db->quote($invoice->CustomerName) . "', " .
         "invoice_date = '" . substr($invoice->InvoiceDate, 0, 10) . "', " .
         "due_date = '" . substr($invoice->DueDate, 0, 10) . "', " .
         "status = '" . ($invoice->Paid === 1 ? "Paid" : "Unpaid") . "', " .
@@ -495,14 +495,14 @@ function updateLineItem($lineItem, $parentId)
 
     $sql = "UPDATE aos_products_quotes " .
         "SET product_qty = '" . $lineItem->Quantity . "', " .
-        "item_description = '" . $lineItem->Description . "', " .
+        "item_description = '" . $db->quote($lineItem->Description) . "', " .
         "product_list_price = '" . $lineItem->Rate . "', " .
         "product_unit_price = '" . $lineItem->Rate . "', " .
         "vat = '" . round($lineItem->VatRate, 1) . "', " .
         "vat_amt = '" . round($lineItem->VatRate, 2) . "', " .
         "number = '" . $lineItem->Sort . "', " .
         "product_id = '" . $productRow['id'] . "', " .
-        "name = '" . (empty($productRow['name']) ? $lineItem->Description : $productRow['name']) . "', " .
+        "name = '" . $db->quote((empty($productRow['name']) ? $lineItem->Description : $productRow['name'])) . "', " .
         "part_number = '" . $productRow['part_number'] . "', " .
         "parent_type = 'AOS_Invoices', " .
         "parent_id = '$parentId', " .
