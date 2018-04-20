@@ -454,6 +454,9 @@ function updateLineItems($parentId, $invoice) {
         } else {
             $lineArray = $invoice->Lines->anyType;
         }
+        if (!is_array(!$lineArray)) {
+            $lineArray = [$lineArray];
+        }
         $existingInDb = checkIfKashFlowRecordsExists(
             $lineArray,
             'aos_products_quotes',
