@@ -5,7 +5,7 @@
  * SugarCRM, Inc. Copyright (C) 2004-2013 SugarCRM Inc.
  *
  * SuiteCRM is an extension to SugarCRM Community Edition developed by SalesAgility Ltd.
- * Copyright (C) 2011 - 2017 SalesAgility Ltd.
+ * Copyright (C) 2011 - 2018 SalesAgility Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
@@ -38,7 +38,25 @@
  * display the words "Powered by SugarCRM" and "Supercharged by SuiteCRM".
  */
 *}
-<span class="sugar_field" id="{{if empty($displayParams.idName)}}{{sugarvar key='name'}}{{else}}{{$displayParams.idName}}{{/if}}">{{sugarvar key='value' htmlentitydecode='true'}}</span>
-{{if !empty($displayParams.enableConnectors)}}
-{{sugarvar_connector view='DetailView'}}
+
+{if empty({{sugarvar key='value' string=true}})}
+{assign var="value" value={{sugarvar key='default_value' string=true}} }
+{else}
+{assign var="value" value={{sugarvar key='value' string=true}} }
+{/if}
+
+
+{{capture name=idname assign=idname}}{{sugarvar key='name'}}{{/capture}}
+{{if !empty($displayParams.idName)}}
+    {{assign var=idname value=$displayParams.idName}}
 {{/if}}
+
+
+<textarea  id='{{$idname}}' name='{{$idname}}'
+rows="{{if !empty($displayParams.rows)}}{{$displayParams.rows}}{{elseif !empty($vardef.rows)}}{{$vardef.rows}}{{else}}{{4}}{{/if}}"
+cols="{{if !empty($displayParams.cols)}}{{$displayParams.cols}}{{elseif !empty($vardef.cols)}}{{$vardef.cols}}{{else}}{{60}}{{/if}}"
+title='{{$vardef.help}}' tabindex="{{$tabindex}}" {{$displayParams.field}}
+{{if !empty($displayParams.accesskey)}} accesskey='{{$displayParams.accesskey}}' {{/if}} >{$value}</textarea>
+
+
+{literal}{{$tinymce}}{/literal}

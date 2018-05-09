@@ -79,6 +79,11 @@ class SugarFieldHtml extends SugarFieldBase
 
         $this->setup($parentFieldArray, $vardef, $displayParams, $tabindex);
 
+        require_once ("include/SugarTinyMCE.php");
+        $tiny = new SugarTinyMCE();
+        $editor = $tiny->getInstance($vardef['name'], 'email_compose_light');
+        $this->ss->assign("tinymce", $editor);
+
         return $this->fetch($this->findTemplate('EditView'));
     }
 
