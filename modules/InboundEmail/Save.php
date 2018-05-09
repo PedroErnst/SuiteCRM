@@ -285,6 +285,7 @@ if(empty($foldersFoundRow)) {
 
             $folder->new_with_id = false;
             $folder->id = $focus->id;
+            $folder->is_group = !(bool)$focus->is_personal;
             $folder->save();
 
             $parent_id = $folder->id;
@@ -296,6 +297,7 @@ if(empty($foldersFoundRow)) {
                 $folder->$key = $val;
             }
 
+            $folder->is_group = !(bool)$focus->is_personal;
             $folder->save();
         }
     }
@@ -325,6 +327,7 @@ if(empty($foldersFoundRow)) {
         $folder = new SugarFolder();
         $folder->retrieve($row['id']);
         $folder->name = $name;
+        $folder->is_group = !(bool)$focus->is_personal;
         $folder->save();
     }
 }

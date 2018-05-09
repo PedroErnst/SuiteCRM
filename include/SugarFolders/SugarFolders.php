@@ -100,7 +100,7 @@ class SugarFolder
         " f.dynamic_query, f.folder_type, f.created_by, f.deleted FROM folders f LEFT JOIN folders_subscriptions".
         " fs ON f.id = fs.folder_id LEFT JOIN inbound_email i on  i.id = f.id ";
         $this->coreWhere = "WHERE f.deleted != 1 ";
-        $this->coreWhereSubscribed = "WHERE f.deleted != 1 AND i.deleted != 1 AND fs.assigned_user_id = ";
+        $this->coreWhereSubscribed = "WHERE f.deleted != 1 AND i.deleted != 1 AND (f.is_group = 1 OR fs.assigned_user_id = ";
         $this->coreOrderBy = " ORDER BY f.is_dynamic, f.is_group, f.name ASC ";
         $this->hrSortLocal = array(
             'flagged' => 'type',
@@ -566,7 +566,7 @@ class SugarFolder
 
         if ($subscribed) {
             $q = $this->coreSubscribed . $teamSecurityClause .
-                $this->coreWhereSubscribed . "'{$user->id}' " . $rootWhere . $this->coreOrderBy;
+                $this->coreWhereSubscribed . "'{$user->id}') " . $rootWhere . $this->coreOrderBy;
         } else {
             $q = $this->core . $teamSecurityClause . $this->coreWhere . $rootWhere . $this->coreOrderBy;
         }
@@ -1068,9 +1068,14 @@ class SugarFolder
             $q3 = "UPDATE folders SET has_child = 1 WHERE id = '{$this->parent_folder}'";
             $r3 = $this->db->query($q3);
         } else {
-            $q = "UPDATE folders SET name = '{$this->name}', parent_folder = '{$this->parent_folder}',".
-                " dynamic_query = '{$this->dynamic_query}', assign_to_id = '{$this->assign_to_id}', " .
-                "modified_by = '{$current_user->id}' WHERE id = '{$this->id}'";
+            $q = "UPDATE folders "
+                . "SET name = '{$this->name}', "
+                . "parent_folder = '{$this->parent_folder}', "
+                . "dynamic_query = '{$this->dynamic_query}', "
+                . "assign_to_id = '{$this->assign_to_id}', "
+                . "is_group = '{$this->is_group}', "
+                . "modified_by = '{$current_user->id}' "
+                . "WHERE id = '{$this->id}'";
         }
 
         $this->db->query($q, true);
