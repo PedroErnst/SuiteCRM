@@ -48,11 +48,25 @@ if (!defined('sugarEntry') || !sugarEntry) {
  */
 class EntryPointConfirmOptInHandler
 {
-
     /**
      * @var EmailAddress $emailAddress
      */
     private $emailAddress;
+
+    /**
+     * @var int
+     */
+    private $confirmedOptInEmailsSent = 0;
+
+    /**
+     * @var int
+     */
+    private $warnings = 0;
+
+    /**
+     * @var int
+     */
+    private $errors = 1;
 
     /**
      *
@@ -111,38 +125,52 @@ class EntryPointConfirmOptInHandler
             return false;
         }
 
-        $module = $post['module'];
-        $uids = explode(',', $post['uid']);
-        $confirmedOptInEmailsSent = 0;
-        $errors = 0;
-        $warnings = 0;
         $msg = '';
 
-        foreach ($uids as $uid) {
-            $emailMan = new EmailMan();
-            if (!$emailMan->addOptInEmailToEmailQueue($module, $uid)) {
-                $errors++;
-            } elseif ($emailMan->getLastOptInWarn()) {
-                $warnings++;
-            } else {
-                $confirmedOptInEmailsSent++;
+        if (!empty($post['uid'])) {
+            $module = $post['module'];
+            $uids = explode(',', $post['uid']);
+            foreach ($uids as $uid) {
+                $this->addToOptInQueue($module, $uid);
+            }
+        }
+        elseif (!empty($_REQUEST['select_entire_list']) && !empty($_REQUEST['module'])) {
+            $bean = BeanFactory::getBean($_REQUEST['module']);
+            $allRecords = $bean->get_full_list();
+            foreach ($allRecords as $record) {
+                $this->addToOptInQueue($_REQUEST['module'], $record->id);
             }
         }
 
-        if ($confirmedOptInEmailsSent > 0) {
-            $msg .= sprintf($app_strings['RESPONSE_SEND_CONFIRM_OPT_IN_EMAIL'], $confirmedOptInEmailsSent);
+        if ($this->confirmedOptInEmailsSent > 0) {
+            $msg .= sprintf($app_strings['RESPONSE_SEND_CONFIRM_OPT_IN_EMAIL'], $this->confirmedOptInEmailsSent);
         }
 
-        if ($warnings > 0) {
-            $msg .=  sprintf($app_strings['RESPONSE_SEND_CONFIRM_OPT_IN_EMAIL_NOT_OPT_IN'], $warnings);
+        if ($this->warnings > 0) {
+            $msg .=  sprintf($app_strings['RESPONSE_SEND_CONFIRM_OPT_IN_EMAIL_NOT_OPT_IN'], $this->warnings);
         }
 
-        if ($errors > 0) {
-            $msg .=  sprintf($app_strings['RESPONSE_SEND_CONFIRM_OPT_IN_EMAIL_MISSING_EMAIL_ADDRESS_ID'], $errors);
+        if ($this->errors > 0) {
+            $msg .=  sprintf($app_strings['RESPONSE_SEND_CONFIRM_OPT_IN_EMAIL_MISSING_EMAIL_ADDRESS_ID'], $this->errors);
         }
-
 
         return $msg;
+    }
+
+    /**
+     * @param string $module
+     * @param string $id
+     */
+    private function addToOptInQueue($module, $id)
+    {
+        $emailMan = new EmailMan();
+        if (!$emailMan->addOptInEmailToEmailQueue($module, $id)) {
+            $this->errors++;
+        } elseif ($emailMan->getLastOptInWarn()) {
+            $this->warnings++;
+        } else {
+            $this->confirmedOptInEmailsSent++;
+        }
     }
 
     /**

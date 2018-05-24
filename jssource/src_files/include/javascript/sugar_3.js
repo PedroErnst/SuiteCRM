@@ -2227,6 +2227,9 @@ sugarListView.prototype.send_form = function (select, currentModule, action, no_
 
     if (return_info)
       href += return_info;
+
+    href += "&select_entire_list=1";
+
     var newForm = document.createElement('form');
     newForm.method = 'post';
     newForm.action = href;
