@@ -220,6 +220,10 @@ class ACLRole extends SugarBean
             $query .=		" LEFT JOIN acl_roles_actions ON acl_roles_actions.role_id = '$role_id' AND  acl_roles_actions.action_id = acl_actions.id AND acl_roles_actions.deleted = 0";
         }
         $query .= " WHERE acl_actions.deleted=0 ORDER BY acl_actions.category, acl_actions.name";
+        if (!empty($role_id)) {
+            // Ensure same sorting as used when building ACL Session array
+            $query .=		", acl_roles_actions.access_override IS NOT NULL asc, acl_roles_actions.access_override desc";
+        }
         $result = $db->query($query);
         $role_actions = array();
 
